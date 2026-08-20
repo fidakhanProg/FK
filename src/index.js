@@ -215,84 +215,66 @@ const AppContainer = () => {
         </div>
 
 
-        <ul className={`navList ${isMenuOpen ? "open" : ""}`}>
+       <ul className={`navList ${isMenuOpen ? "open" : ""}`}>
 
   <li>
-    <a
-      href="#home"
+    <button
+      type="button"
       className="section-link"
-      onClick={(e) => {
-        e.preventDefault();
-        goToSection("home");
-      }}
+      onClick={() => goToSection("home")}
     >
       Home
-    </a>
+    </button>
   </li>
 
   <li>
-    <a
-      href="#about"
+    <button
+      type="button"
       className="section-link"
-      onClick={(e) => {
-        e.preventDefault();
-        goToSection("about");
-      }}
+      onClick={() => goToSection("about")}
     >
       About
-    </a>
+    </button>
   </li>
 
   <li>
-    <a
-      href="#services"
+    <button
+      type="button"
       className="section-link"
-      onClick={(e) => {
-        e.preventDefault();
-        goToSection("services");
-      }}
+      onClick={() => goToSection("services")}
     >
       Services
-    </a>
+    </button>
   </li>
 
   <li>
-    <a
-      href="#skills"
+    <button
+      type="button"
       className="section-link"
-      onClick={(e) => {
-        e.preventDefault();
-        goToSection("skills");
-      }}
+      onClick={() => goToSection("skills")}
     >
       Skills
-    </a>
+    </button>
   </li>
 
   <li>
-    <a
-      href="#portfolio"
+    <button
+      type="button"
       className="section-link"
-      onClick={(e) => {
-        e.preventDefault();
-        goToSection("portfolio");
-      }}
+      onClick={() => goToSection("portfolio")}
     >
       Portfolio
-    </a>
+    </button>
   </li>
 
   <li>
-    <a
-      href="#contact"
+    <button
+      type="button"
       className="section-link"
-      onClick={(e) => {
-        e.preventDefault();
-        goToSection("contact");
-      }}
+      onClick={() => goToSection("contact")}
     >
       Contact
-    </a>
+    </button>
   </li>
 
   <li>
