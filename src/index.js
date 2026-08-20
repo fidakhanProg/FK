@@ -1,35 +1,30 @@
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom/client";
 
-import Education from "./pages/Education"
-import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import reportWebVitals from './reportWebVitals';
-import App from './App';
-import PortfolioSection from './sections/portfolio';
-import Typewriter from 'typewriter-effect';
+import "./index.css";
+import reportWebVitals from "./reportWebVitals";
+
+import PortfolioSection from "./sections/portfolio";
 import ContactForm from "./sections/contact-form";
-import 'boxicons/css/boxicons.min.css';
+import Education from "./pages/Education";
 
+import Typewriter from "typewriter-effect";
+import "boxicons/css/boxicons.min.css";
 
-
-import { HashRouter, Routes, Route, Link, useLocation } from "react-router-dom";
-
-
-
-
-
-
-
-
-
-
+import {
+  HashRouter,
+  Routes,
+  Route,
+  Link,
+  useLocation,
+} from "react-router-dom";
 
 
 // =====================================================
 // MAIN PORTFOLIO
 // =====================================================
 
-const AppContainer = () => {
+function AppContainer() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -51,23 +46,18 @@ const AppContainer = () => {
 
 
   // =====================================================
-  // WHEN EDUCATION PAGE IS OPEN
+  // SCROLL + ACTIVE MENU
   // =====================================================
 
   useEffect(() => {
 
-    // If we are on education page, don't run
-    // portfolio scroll functions.
+    // Only run on main portfolio page
     if (location.pathname !== "/") {
       return;
     }
 
     const header = document.querySelector("header");
 
-
-    // =================================================
-    // ACTIVE MENU
-    // =================================================
 
     const activeMenu = () => {
 
@@ -76,9 +66,8 @@ const AppContainer = () => {
       );
 
       const menuLinks = document.querySelectorAll(
-        "header .navList a.section-link"
+        "header .section-link"
       );
-
 
       if (!sections.length || !menuLinks.length) {
         return;
@@ -91,7 +80,7 @@ const AppContainer = () => {
       sections.forEach((section, index) => {
 
         const sectionTop =
-          section.offsetTop - 120;
+          section.offsetTop - 150;
 
         if (window.scrollY >= sectionTop) {
           currentSection = index;
@@ -106,17 +95,15 @@ const AppContainer = () => {
 
 
       if (menuLinks[currentSection]) {
+
         menuLinks[currentSection].classList.add(
           "active"
         );
+
       }
 
     };
 
-
-    // =================================================
-    // STICKY HEADER
-    // =================================================
 
     const handleScroll = () => {
 
@@ -169,113 +156,204 @@ const AppContainer = () => {
   // =====================================================
 
   const goToSection = (sectionId) => {
-  closeMenu();
 
-  const element = document.getElementById(sectionId);
-
-  if (element) {
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-  }
-};
+    closeMenu();
 
 
-   
+    // If currently on Education page,
+    // return to portfolio first.
+    if (location.pathname !== "/") {
+
+      window.location.hash = "#/";
+
+      setTimeout(() => {
+
+        const element =
+          document.getElementById(sectionId);
+
+        if (element) {
+
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+
+        }
+
+      }, 150);
+
+      return;
+    }
+
+
+    // Already on portfolio page
+
+    const element =
+      document.getElementById(sectionId);
+
+
+    if (element) {
+
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+
+    }
+
+  };
+
 
   // =====================================================
-  // MAIN PAGE
+  // RETURN
   // =====================================================
 
   return (
     <>
-
       {/* =================================================
-          NAVBAR
+          HEADER
       ================================================= */}
 
       <header>
+
+        {/* LOGO */}
 
         <div className="logo">
           <span>Fida</span>Khan.
         </div>
 
 
-     <ul className={`navList ${isMenuOpen ? "open" : ""}`}>
+        {/* =================================================
+            NAVIGATION
+        ================================================= */}
 
-  <li>
-    <button
-      type="button"
-      className="section-link"
-      onClick={() => goToSection("home")}
-    >
-      Home
-    </button>
-  </li>
+        <ul
+          className={`navList ${
+            isMenuOpen ? "open" : ""
+          }`}
+        >
 
-  <li>
-    <button
-      type="button"
-      className="section-link"
-      onClick={() => goToSection("about")}
-    >
-      About
-    </button>
-  </li>
+          {/* HOME */}
 
-  <li>
-    <button
-      type="button"
-      className="section-link"
-      onClick={() => goToSection("services")}
-    >
-      Services
-    </button>
-  </li>
+          <li>
 
-  <li>
-    <button
-      type="button"
-      className="section-link"
-      onClick={() => goToSection("skills")}
-    >
-      Skills
-    </button>
-  </li>
+            <button
+              type="button"
+              className="section-link"
+              onClick={() =>
+                goToSection("home")
+              }
+            >
+              Home
+            </button>
 
-  <li>
-    <button
-      type="button"
-      className="section-link"
-      onClick={() => goToSection("portfolio")}
-    >
-      Portfolio
-    </button>
-  </li>
+          </li>
 
-  <li>
-    <button
-      type="button"
-      className="section-link"
-      onClick={() => goToSection("contact")}
-    >
-      Contact
-    </button>
-  </li>
 
-  <li>
-    <Link
-      to="/education"
-      onClick={closeMenu}
-    >
-      Education
-    </Link>
-  </li>
+          {/* ABOUT */}
 
-</ul>
+          <li>
 
-        {/* MOBILE MENU BUTTON */}
+            <button
+              type="button"
+              className="section-link"
+              onClick={() =>
+                goToSection("about")
+              }
+            >
+              About
+            </button>
+
+          </li>
+
+
+          {/* SERVICES */}
+
+          <li>
+
+            <button
+              type="button"
+              className="section-link"
+              onClick={() =>
+                goToSection("services")
+              }
+            >
+              Services
+            </button>
+
+          </li>
+
+
+          {/* SKILLS */}
+
+          <li>
+
+            <button
+              type="button"
+              className="section-link"
+              onClick={() =>
+                goToSection("skills")
+              }
+            >
+              Skills
+            </button>
+
+          </li>
+
+
+          {/* PORTFOLIO */}
+
+          <li>
+
+            <button
+              type="button"
+              className="section-link"
+              onClick={() =>
+                goToSection("portfolio")
+              }
+            >
+              Portfolio
+            </button>
+
+          </li>
+
+
+          {/* CONTACT */}
+
+          <li>
+
+            <button
+              type="button"
+              className="section-link"
+              onClick={() =>
+                goToSection("contact")
+              }
+            >
+              Contact
+            </button>
+
+          </li>
+
+
+          {/* EDUCATION */}
+
+          <li>
+
+            <Link
+              to="/education"
+              onClick={closeMenu}
+            >
+              Education
+            </Link>
+
+          </li>
+
+        </ul>
+
+
+        {/* =================================================
+            MOBILE MENU BUTTON
+        ================================================= */}
 
         <div
           id="menu-icon"
@@ -285,8 +363,7 @@ const AppContainer = () => {
               : "bx-menu"
           }`}
           onClick={handleClick}
-        >
-        </div>
+        />
 
       </header>
 
@@ -335,9 +412,8 @@ const AppContainer = () => {
                       "Frontend Developer",
                       "Python Developer",
                       "AI Developer",
-                      "SQL Developer"
-                    ]
-
+                      "SQL Developer",
+                    ],
                   }}
                 />
 
@@ -362,6 +438,8 @@ const AppContainer = () => {
               high-quality results.
             </p>
 
+
+            {/* BUTTONS */}
 
             <div className="btn-box">
 
@@ -392,7 +470,7 @@ const AppContainer = () => {
                 href="mailto:engrfidabettani@gmail.com"
                 title="Email"
               >
-                <i className="bx bxs-envelope"></i>
+                <i className="bx bxs-envelope" />
               </a>
 
 
@@ -402,7 +480,7 @@ const AppContainer = () => {
                 rel="noreferrer"
                 title="LinkedIn"
               >
-                <i className="bx bxl-linkedin"></i>
+                <i className="bx bxl-linkedin" />
               </a>
 
 
@@ -412,7 +490,7 @@ const AppContainer = () => {
                 rel="noreferrer"
                 title="GitHub"
               >
-                <i className="bx bxl-github"></i>
+                <i className="bx bxl-github" />
               </a>
 
 
@@ -422,7 +500,7 @@ const AppContainer = () => {
                 rel="noreferrer"
                 title="Facebook"
               >
-                <i className="bx bxl-facebook"></i>
+                <i className="bx bxl-facebook" />
               </a>
 
 
@@ -432,7 +510,7 @@ const AppContainer = () => {
                 rel="noreferrer"
                 title="TikTok"
               >
-                <i className="bx bxl-tiktok"></i>
+                <i className="bx bxl-tiktok" />
               </a>
 
             </div>
@@ -457,7 +535,6 @@ const AppContainer = () => {
           </div>
 
         </section>
-
 
 
         {/* =================================================
@@ -559,7 +636,6 @@ const AppContainer = () => {
         </section>
 
 
-
         {/* =================================================
             SERVICES
         ================================================= */}
@@ -585,11 +661,11 @@ const AppContainer = () => {
           <div className="section_services">
 
 
-            {/* .NET */}
+            {/* DOT NET */}
 
             <div className="service-box">
 
-              <i className="bx bxs-layer service-icon"></i>
+              <i className="bx bxs-layer service-icon" />
 
               <h3>
                 Dot Net
@@ -611,7 +687,7 @@ const AppContainer = () => {
 
             <div className="service-box">
 
-              <i className="bx bx-desktop service-icon"></i>
+              <i className="bx bx-desktop service-icon" />
 
               <h3>
                 Responsive Web Design
@@ -632,7 +708,7 @@ const AppContainer = () => {
 
             <div className="service-box">
 
-              <i className="bx bx-code-alt service-icon"></i>
+              <i className="bx bx-code-alt service-icon" />
 
               <h3>
                 React JS
@@ -651,7 +727,6 @@ const AppContainer = () => {
           </div>
 
         </section>
-
 
 
         {/* =================================================
@@ -679,7 +754,7 @@ const AppContainer = () => {
           <div className="skill-main">
 
 
-            {/* TECHNICAL */}
+            {/* TECHNICAL SKILLS */}
 
             <div className="skill-left">
 
@@ -688,132 +763,204 @@ const AppContainer = () => {
               </h3>
 
 
+              {/* .NET */}
+
               <div className="skill-bar">
+
                 <div className="info">
                   <p>Dot Net C#</p>
                   <p>99%</p>
                 </div>
 
                 <div className="bar">
-                  <span className="html"></span>
+                  <span className="html" />
                 </div>
+
               </div>
 
 
+              {/* SQL */}
+
               <div className="skill-bar">
+
                 <div className="info">
                   <p>Microsoft SQL Server</p>
                   <p>100%</p>
                 </div>
 
                 <div className="bar">
-                  <span className="css"></span>
+                  <span className="css" />
                 </div>
+
               </div>
 
 
+              {/* PYTHON */}
+
               <div className="skill-bar">
+
                 <div className="info">
                   <p>Python</p>
                   <p>87%</p>
                 </div>
 
                 <div className="bar">
-                  <span className="bootstrap"></span>
+                  <span className="bootstrap" />
                 </div>
+
               </div>
 
 
+              {/* HTML CSS */}
+
               <div className="skill-bar">
+
                 <div className="info">
+
                   <p>
                     HTML/CSS/Bootstrap/Tailwind
                   </p>
 
                   <p>100%</p>
+
                 </div>
 
                 <div className="bar">
-                  <span className="tailwind"></span>
+                  <span className="tailwind" />
                 </div>
+
               </div>
 
 
+              {/* JAVASCRIPT */}
+
               <div className="skill-bar">
+
                 <div className="info">
-                  <p>JavaScript</p>
+
+                  <p>
+                    JavaScript
+                  </p>
+
                   <p>74%</p>
+
                 </div>
 
                 <div className="bar">
-                  <span className="javascript"></span>
+                  <span className="javascript" />
                 </div>
+
               </div>
 
 
+              {/* REACT */}
+
               <div className="skill-bar">
+
                 <div className="info">
-                  <p>React.js</p>
+
+                  <p>
+                    React.js
+                  </p>
+
                   <p>99%</p>
+
                 </div>
 
                 <div className="bar">
-                  <span className="bootstrap"></span>
+                  <span className="bootstrap" />
                 </div>
+
               </div>
 
 
+              {/* JAVA */}
+
               <div className="skill-bar">
+
                 <div className="info">
-                  <p>Java</p>
+
+                  <p>
+                    Java
+                  </p>
+
                   <p>85%</p>
+
                 </div>
 
                 <div className="bar">
-                  <span className="bootstrap"></span>
+                  <span className="bootstrap" />
                 </div>
+
               </div>
 
 
+              {/* ORACLE */}
+
               <div className="skill-bar">
+
                 <div className="info">
-                  <p>Oracle / PL/SQL</p>
+
+                  <p>
+                    Oracle / PL/SQL
+                  </p>
+
                   <p>82%</p>
+
                 </div>
 
                 <div className="bar">
-                  <span className="bootstrap"></span>
+                  <span className="bootstrap" />
                 </div>
+
               </div>
 
 
+              {/* NODE */}
+
               <div className="skill-bar">
+
                 <div className="info">
-                  <p>Node.js / Express.js</p>
+
+                  <p>
+                    Node.js / Express.js
+                  </p>
+
                   <p>70%</p>
+
                 </div>
 
                 <div className="bar">
-                  <span className="bootstrap"></span>
+                  <span className="bootstrap" />
                 </div>
+
               </div>
 
 
+              {/* AI */}
+
               <div className="skill-bar">
+
                 <div className="info">
-                  <p>AI / ML</p>
+
+                  <p>
+                    AI / ML
+                  </p>
+
                   <p>87%</p>
+
                 </div>
 
                 <div className="bar">
-                  <span className="bootstrap"></span>
+                  <span className="bootstrap" />
                 </div>
+
               </div>
 
             </div>
 
 
-            {/* PROFESSIONAL */}
+            {/* PROFESSIONAL SKILLS */}
 
             <div className="skill-right">
 
@@ -823,6 +970,9 @@ const AppContainer = () => {
 
 
               <div className="radial-bars">
+
+
+                {/* CREATIVITY */}
 
                 <div className="radial-bar">
 
@@ -844,9 +994,11 @@ const AppContainer = () => {
 
                   </svg>
 
+
                   <div className="Percentage">
                     90%
                   </div>
+
 
                   <div className="text">
                     Creativity
@@ -854,6 +1006,8 @@ const AppContainer = () => {
 
                 </div>
 
+
+                {/* COMMUNICATION */}
 
                 <div className="radial-bar">
 
@@ -875,9 +1029,11 @@ const AppContainer = () => {
 
                   </svg>
 
+
                   <div className="Percentage">
                     65%
                   </div>
+
 
                   <div className="text">
                     Communication
@@ -890,6 +1046,9 @@ const AppContainer = () => {
 
               <div className="radial-bars">
 
+
+                {/* PROBLEM SOLVING */}
+
                 <div className="radial-bar">
 
                   <svg viewBox="0 0 200 200">
@@ -910,9 +1069,11 @@ const AppContainer = () => {
 
                   </svg>
 
+
                   <div className="Percentage">
                     75%
                   </div>
+
 
                   <div className="text">
                     Problem Solving
@@ -921,6 +1082,8 @@ const AppContainer = () => {
                 </div>
 
 
+                {/* TEAMWORK */}
+
                 <div className="radial-bar">
 
                   <svg viewBox="0 0 200 200">
@@ -941,9 +1104,11 @@ const AppContainer = () => {
 
                   </svg>
 
+
                   <div className="Percentage">
                     85%
                   </div>
+
 
                   <div className="text">
                     Team Work
@@ -960,7 +1125,6 @@ const AppContainer = () => {
         </section>
 
 
-
         {/* =================================================
             PORTFOLIO
         ================================================= */}
@@ -973,7 +1137,6 @@ const AppContainer = () => {
           <PortfolioSection />
 
         </section>
-
 
 
         {/* =================================================
@@ -1003,7 +1166,6 @@ const AppContainer = () => {
         </section>
 
 
-
         {/* =================================================
             FOOTER
         ================================================= */}
@@ -1011,21 +1173,20 @@ const AppContainer = () => {
         <footer>
 
           <p>
-            Copyright &copy; 2024 by Fida Khan
+            Copyright © 2024 by Fida Khan
             Developer || All Rights Reserved.
           </p>
 
 
-          <a
-            href="#home"
+          <button
+            type="button"
             title="Go to Home"
-            onClick={(e) => {
-              e.preventDefault();
-              goToSection("home");
-            }}
+            onClick={() =>
+              goToSection("home")
+            }
           >
-            <i className="bx bx-up-arrow-alt"></i>
-          </a>
+            <i className="bx bx-up-arrow-alt" />
+          </button>
 
         </footer>
 
@@ -1033,8 +1194,7 @@ const AppContainer = () => {
 
     </>
   );
-};
-
+}
 
 
 // =====================================================
@@ -1062,7 +1222,7 @@ root.render(
         />
 
 
-        {/* EDUCATION */}
+        {/* EDUCATION PAGE */}
 
         <Route
           path="/education"
