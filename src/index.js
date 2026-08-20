@@ -185,7 +185,7 @@ function AppContainer() {
           <li>
 
             <a
-              href="#"
+              href="#home"
               data-section="home"
               onClick={(e) => {
 
@@ -206,7 +206,7 @@ function AppContainer() {
           <li>
 
             <a
-              href="#"
+              href="#about"
               data-section="about"
               onClick={(e) => {
 
