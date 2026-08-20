@@ -169,33 +169,20 @@ const AppContainer = () => {
   // =====================================================
 
   const goToSection = (sectionId) => {
+  closeMenu();
 
-    closeMenu();
+  const element = document.getElementById(sectionId);
+
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+};
 
 
-    // If we are already on home
-    if (location.pathname === "/") {
-
-      setTimeout(() => {
-
-        const element =
-          document.getElementById(sectionId);
-
-        if (element) {
-
-          element.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-
-        }
-
-      }, 50);
-
-    }
-
-  };
-
+   
 
   // =====================================================
   // MAIN PAGE
@@ -215,7 +202,7 @@ const AppContainer = () => {
         </div>
 
 
-       <ul className={`navList ${isMenuOpen ? "open" : ""}`}>
+     <ul className={`navList ${isMenuOpen ? "open" : ""}`}>
 
   <li>
     <button
