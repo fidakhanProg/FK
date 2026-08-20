@@ -215,121 +215,96 @@ const AppContainer = () => {
         </div>
 
 
-        <ul
-          className={`navList ${
-            isMenuOpen ? "open" : ""
-          }`}
-        >
+        <ul className={`navList ${isMenuOpen ? "open" : ""}`}>
 
-          {/* HOME */}
+  <li>
+    <a
+      href="#home"
+      className="section-link"
+      onClick={(e) => {
+        e.preventDefault();
+        goToSection("home");
+      }}
+    >
+      Home
+    </a>
+  </li>
 
-          <li>
-            <a
-              href="#home"
-              className="section-link"
-              onClick={(e) => {
-                e.preventDefault();
-                goToSection("home");
-              }}
-            >
-              Home
-            </a>
-          </li>
+  <li>
+    <a
+      href="#about"
+      className="section-link"
+      onClick={(e) => {
+        e.preventDefault();
+        goToSection("about");
+      }}
+    >
+      About
+    </a>
+  </li>
 
+  <li>
+    <a
+      href="#services"
+      className="section-link"
+      onClick={(e) => {
+        e.preventDefault();
+        goToSection("services");
+      }}
+    >
+      Services
+    </a>
+  </li>
 
-          {/* ABOUT */}
+  <li>
+    <a
+      href="#skills"
+      className="section-link"
+      onClick={(e) => {
+        e.preventDefault();
+        goToSection("skills");
+      }}
+    >
+      Skills
+    </a>
+  </li>
 
-          <li>
-            <a
-              href="#about"
-              className="section-link"
-              onClick={(e) => {
-                e.preventDefault();
-                goToSection("about");
-              }}
-            >
-              About
-            </a>
-          </li>
+  <li>
+    <a
+      href="#portfolio"
+      className="section-link"
+      onClick={(e) => {
+        e.preventDefault();
+        goToSection("portfolio");
+      }}
+    >
+      Portfolio
+    </a>
+  </li>
 
+  <li>
+    <a
+      href="#contact"
+      className="section-link"
+      onClick={(e) => {
+        e.preventDefault();
+        goToSection("contact");
+      }}
+    >
+      Contact
+    </a>
+  </li>
 
-          {/* SERVICES */}
+  <li>
+    <Link
+      to="/education"
+      onClick={closeMenu}
+    >
+      Education
+    </Link>
+  </li>
 
-          <li>
-            <a
-              href="#services"
-              className="section-link"
-              onClick={(e) => {
-                e.preventDefault();
-                goToSection("services");
-              }}
-            >
-              Services
-            </a>
-          </li>
-
-
-          {/* SKILLS */}
-
-          <li>
-            <a
-              href="#skills"
-              className="section-link"
-              onClick={(e) => {
-                e.preventDefault();
-                goToSection("skills");
-              }}
-            >
-              Skills
-            </a>
-          </li>
-
-
-          {/* PORTFOLIO */}
-
-          <li>
-            <a
-              href="#portfolio"
-              className="section-link"
-              onClick={(e) => {
-                e.preventDefault();
-                goToSection("portfolio");
-              }}
-            >
-              Portfolio
-            </a>
-          </li>
-
-
-          {/* CONTACT */}
-
-          <li>
-            <a
-              href="#contact"
-              className="section-link"
-              onClick={(e) => {
-                e.preventDefault();
-                goToSection("contact");
-              }}
-            >
-              Contact
-            </a>
-          </li>
-
-
-          {/* EDUCATION */}
-
-          <li>
-            <Link
-              to="/education"
-              onClick={closeMenu}
-            >
-              Education
-            </Link>
-          </li>
-
-        </ul>
-
+</ul>
 
         {/* MOBILE MENU BUTTON */}
 
