@@ -13,179 +13,323 @@ import Education from "./pages/Education";
 import reportWebVitals from "./reportWebVitals";
 
 
-const AppContainer = () => {
+function AppContainer() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Mobile menu
+
+  // ================================
+  // MOBILE MENU
+  // ================================
+
   const handleClick = () => {
     setIsMenuOpen((prev) => !prev);
   };
 
-  // Close mobile menu
+
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
 
 
-  useEffect(() => {
+  // ================================
+  // SCROLL TO SECTION
+  // ================================
 
-    const menuLi = document.querySelectorAll("header ul li a");
-    const sections = document.querySelectorAll("section");
-    const header = document.querySelector("header");
+  const scrollToSection = (sectionId) => {
 
-    // Active menu on scroll
-    const activeMenu = () => {
+    closeMenu();
 
-      if (!sections.length || !menuLi.length) {
-        return;
-      }
+    const section = document.getElementById(sectionId);
 
-      let len = sections.length - 1;
+    if (section) {
 
-      while (
-        len > 0 &&
-        window.scrollY + 97 < sections[len].offsetTop
-      ) {
-        len--;
-      }
-
-      menuLi.forEach((item) => {
-        item.classList.remove("active");
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
       });
 
-      if (menuLi[len]) {
-        menuLi[len].classList.add("active");
-      }
-    };
+    }
+
+  };
 
 
-    // Sticky header
+  // ================================
+  // ACTIVE MENU + STICKY HEADER
+  // ================================
+
+  useEffect(() => {
+
+    const header = document.querySelector("header");
+
+    const menuLinks = document.querySelectorAll(
+      "header a[data-section]"
+    );
+
+    const sections = document.querySelectorAll(
+      "section[data-section]"
+    );
+
+
     const handleScroll = () => {
 
+      // Sticky header
       if (header) {
+
         header.classList.toggle(
           "sticky",
           window.scrollY > 50
         );
+
       }
 
-      // Close menu when scrolling
-      if (isMenuOpen) {
-        setIsMenuOpen(false);
+
+      // Find current section
+      let currentSection = "home";
+
+      sections.forEach((section) => {
+
+        const sectionTop =
+          section.getBoundingClientRect().top;
+
+        if (sectionTop <= 150) {
+
+          currentSection =
+            section.getAttribute("data-section");
+
+        }
+
+      });
+
+
+      // Remove active class
+      menuLinks.forEach((link) => {
+
+        link.classList.remove("active");
+
+      });
+
+
+      // Add active class
+      const activeLink =
+        document.querySelector(
+          `header a[data-section="${currentSection}"]`
+        );
+
+      if (activeLink) {
+
+        activeLink.classList.add("active");
+
       }
+
     };
 
 
-    activeMenu();
+    handleScroll();
 
-    window.addEventListener("scroll", activeMenu);
-    window.addEventListener("scroll", handleScroll);
+
+    window.addEventListener(
+      "scroll",
+      handleScroll
+    );
 
 
     return () => {
 
-      window.removeEventListener("scroll", activeMenu);
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
 
     };
 
-  }, [isMenuOpen]);
+  }, []);
 
+
+  // ================================
+  // HOME PAGE
+  // ================================
 
   return (
     <>
-      {/* ================= NAVBAR ================= */}
+
+      {/* =====================================
+          NAVBAR
+      ====================================== */}
 
       <header>
 
-        <a href="#home" className="logo">
+        <a
+          href="#"
+          className="logo"
+          onClick={(e) => {
+
+            e.preventDefault();
+
+            scrollToSection("home");
+
+          }}
+        >
           FidaKhan<span>.</span>
         </a>
 
 
-        <ul className={`navList ${isMenuOpen ? "open" : ""}`}>
+        <ul
+          className={`navList ${
+            isMenuOpen ? "open" : ""
+          }`}
+        >
+
+          {/* HOME */}
 
           <li>
+
             <a
-              href="#home"
-              onClick={closeMenu}
+              href="#"
+              data-section="home"
+              onClick={(e) => {
+
+                e.preventDefault();
+
+                scrollToSection("home");
+
+              }}
             >
               Home
             </a>
+
           </li>
 
 
+          {/* ABOUT */}
+
           <li>
+
             <a
-              href="#about"
-              onClick={closeMenu}
+              href="#"
+              data-section="about"
+              onClick={(e) => {
+
+                e.preventDefault();
+
+                scrollToSection("about");
+
+              }}
             >
               About
             </a>
+
           </li>
 
 
+          {/* SERVICES */}
+
           <li>
+
             <a
-              href="#services"
-              onClick={closeMenu}
+              href="#"
+              data-section="services"
+              onClick={(e) => {
+
+                e.preventDefault();
+
+                scrollToSection("services");
+
+              }}
             >
               Services
             </a>
+
           </li>
 
 
+          {/* SKILLS */}
+
           <li>
+
             <a
-              href="#skills"
-              onClick={closeMenu}
+              href="#"
+              data-section="skills"
+              onClick={(e) => {
+
+                e.preventDefault();
+
+                scrollToSection("skills");
+
+              }}
             >
               Skills
             </a>
+
           </li>
 
 
+          {/* PORTFOLIO */}
+
           <li>
+
             <a
-              href="#portfolio"
-              onClick={closeMenu}
+              href="#"
+              data-section="portfolio"
+              onClick={(e) => {
+
+                e.preventDefault();
+
+                scrollToSection("portfolio");
+
+              }}
             >
               Portfolio
             </a>
+
           </li>
 
 
+          {/* CONTACT */}
+
           <li>
+
             <a
-              href="#contact"
-              onClick={closeMenu}
+              href="#"
+              data-section="contact"
+              onClick={(e) => {
+
+                e.preventDefault();
+
+                scrollToSection("contact");
+
+              }}
             >
               Contact
             </a>
+
           </li>
 
 
-          {/* Education is a separate page */}
+          {/* EDUCATION */}
 
           <li>
+
             <Link
               to="/education"
               onClick={closeMenu}
             >
               Education
             </Link>
+
           </li>
 
         </ul>
 
 
-        {/* Mobile menu icon */}
+        {/* MOBILE MENU BUTTON */}
 
         <div
           id="menu-icon"
           className={`bx ${
-            isMenuOpen ? "bx-x" : "bx-menu"
+            isMenuOpen
+              ? "bx-x"
+              : "bx-menu"
           }`}
           onClick={handleClick}
         ></div>
@@ -193,18 +337,29 @@ const AppContainer = () => {
       </header>
 
 
-      {/* ================= HOME ================= */}
+      {/* =====================================
+          HOME
+      ====================================== */}
 
-      <section id="home" className="home">
+      <section
+        id="home"
+        data-section="home"
+        className="home"
+      >
 
         <div className="home-content">
 
-          <h1>Hi I'm Fida Khan</h1>
+          <h1>
+            Hi I'm Fida Khan
+          </h1>
 
 
           <div className="change-text">
 
-            <h3>And I'm </h3>
+            <h3>
+              And I'm
+            </h3>
+
 
             <span className="auto-type">
 
@@ -231,15 +386,16 @@ const AppContainer = () => {
 
 
           <p>
-            I am a passionate .NET Developer and Frontend Specialist
-            with a knack for creating visually appealing and
-            user-friendly applications using HTML, CSS, Bootstrap,
-            Tailwind, JavaScript, and React. My skills as a Socket
-            Programmer enable real-time communication solutions,
-            while my expertise in Microsoft SQL Server administration
-            ensures efficient data management. I focus on clean code
-            and engaging user experiences to deliver high-quality
-            results.
+            I am a passionate .NET Developer and
+            Frontend Specialist with a knack for
+            creating visually appealing and
+            user-friendly applications using HTML,
+            CSS, Bootstrap, Tailwind, JavaScript,
+            and React. My skills as a Socket
+            Programmer enable real-time communication
+            solutions, while my expertise in Microsoft
+            SQL Server administration ensures efficient
+            data management.
           </p>
 
 
@@ -264,6 +420,8 @@ const AppContainer = () => {
           </div>
 
 
+          {/* SOCIAL ICONS */}
+
           <div className="social-icons">
 
             <a
@@ -273,6 +431,7 @@ const AppContainer = () => {
               <i className="bx bx-envelope"></i>
             </a>
 
+
             <a
               href="https://github.com/fidakhanProg"
               target="_blank"
@@ -281,6 +440,7 @@ const AppContainer = () => {
             >
               <i className="bx bxl-github"></i>
             </a>
+
 
             <a
               href="https://www.linkedin.com/"
@@ -295,6 +455,8 @@ const AppContainer = () => {
 
         </div>
 
+
+        {/* HOME IMAGE */}
 
         <div className="home-image">
 
@@ -313,9 +475,15 @@ const AppContainer = () => {
       </section>
 
 
-      {/* ================= ABOUT ================= */}
+      {/* =====================================
+          ABOUT
+      ====================================== */}
 
-      <section id="about" className="about">
+      <section
+        id="about"
+        data-section="about"
+        className="about"
+      >
 
         <div className="img-box">
 
@@ -330,51 +498,62 @@ const AppContainer = () => {
 
         <div className="about-content">
 
-          <h2>About Me</h2>
+          <h2>
+            About Me
+          </h2>
 
-          <h3>A story of good</h3>
+
+          <h3>
+            A story of good
+          </h3>
 
 
           <p>
-            My technical expertise includes frontend technologies
-            such as React.js, JavaScript, HTML5, CSS3, Bootstrap,
-            and responsive web design.
+            My technical expertise includes frontend
+            technologies such as React.js, JavaScript,
+            HTML5, CSS3, Bootstrap, and responsive
+            web design.
           </p>
 
 
           <p>
-            On the backend, I work with .NET, C#, Node.js,
-            Express.js, Python, REST APIs, and server-side
-            application development.
+            On the backend, I work with .NET, C#,
+            Node.js, Express.js, Python, REST APIs,
+            and server-side application development.
           </p>
 
 
           <p>
-            I also have strong experience with SQL and database
-            technologies, including Microsoft SQL Server, MySQL,
-            PostgreSQL, MongoDB, and Oracle.
+            I also have strong experience with SQL
+            and database technologies, including
+            Microsoft SQL Server, MySQL, PostgreSQL,
+            MongoDB, and Oracle.
           </p>
 
 
           <p>
-            I am also interested in Artificial Intelligence and
-            Machine Learning, particularly in developing intelligent
-            solutions using Python and deep learning technologies.
+            I am also interested in Artificial
+            Intelligence and Machine Learning,
+            particularly in developing intelligent
+            solutions using Python and deep learning
+            technologies.
           </p>
 
 
           <p>
-            As a Full-Stack Developer, I enjoy working across the
-            complete development lifecycle—from designing attractive
-            and responsive user interfaces to developing secure
-            backend systems, APIs, and efficient databases.
+            As a Full-Stack Developer, I enjoy working
+            across the complete development lifecycle
+            from designing attractive and responsive
+            user interfaces to developing secure
+            backend systems, APIs, and efficient
+            databases.
           </p>
 
 
           <p>
-            I am continuously learning and exploring new technologies
-            to improve my skills and build innovative software
-            solutions.
+            I am continuously learning and exploring
+            new technologies to improve my skills and
+            build innovative software solutions.
           </p>
 
         </div>
@@ -382,18 +561,25 @@ const AppContainer = () => {
       </section>
 
 
-      {/* ================= SERVICES ================= */}
+      {/* =====================================
+          SERVICES
+      ====================================== */}
 
       <section
         id="services"
+        data-section="services"
         className="services"
       >
 
         <div className="main-text">
 
-          <span>What I will do for you</span>
+          <span>
+            What I will do for you
+          </span>
 
-          <h2>Our Services</h2>
+          <h2>
+            Our Services
+          </h2>
 
         </div>
 
@@ -407,72 +593,86 @@ const AppContainer = () => {
 
             <i className="bx bxs-layer service-icon"></i>
 
-            <h3>Dot Net</h3>
+            <h3>
+              Dot Net
+            </h3>
 
             <p>
-              Leverage the power of .NET to build robust,
-              scalable applications tailored to your business
-              needs. I specialize in creating high-performance
-              web and desktop applications with Microsoft SQL
-              Server integration.
+              Leverage the power of .NET to build
+              robust, scalable applications tailored
+              to your business needs. I specialize
+              in creating high-performance web and
+              desktop applications with Microsoft
+              SQL Server integration.
             </p>
 
           </div>
 
 
-          {/* Responsive Web */}
+          {/* RESPONSIVE WEB */}
 
           <div className="service-box">
 
             <i className="bx bx-desktop service-icon"></i>
 
-            <h3>Responsive Web Design</h3>
+            <h3>
+              Responsive Web Design
+            </h3>
 
             <p>
-              Ensure your website looks great on all devices
-              with mobile-first design. I create responsive
-              websites using CSS, Bootstrap, Tailwind, and
-              modern layout techniques.
+              Ensure your website looks great on all
+              devices with mobile-first design. I
+              create responsive websites using CSS,
+              Bootstrap, Tailwind, and modern layout
+              techniques.
             </p>
 
           </div>
 
 
-          {/* React */}
+          {/* REACT */}
 
           <div className="service-box">
 
             <i className="bx bx-code-alt service-icon"></i>
 
-            <h3>React JS</h3>
+            <h3>
+              React JS
+            </h3>
 
             <p>
-              Unlock the potential of your web applications
-              with React.js. I create responsive and engaging
-              web applications using React's component-based
-              architecture.
+              Unlock the potential of your web
+              applications with React.js. I create
+              responsive and engaging web applications
+              using React's component-based architecture.
             </p>
 
           </div>
-
 
         </div>
 
       </section>
 
 
-      {/* ================= SKILLS ================= */}
+      {/* =====================================
+          SKILLS
+      ====================================== */}
 
       <section
         id="skills"
+        data-section="skills"
         className="skills"
       >
 
         <div className="main-text">
 
-          <span>Technical and Professional</span>
+          <span>
+            Technical and Professional
+          </span>
 
-          <h2>My Skills</h2>
+          <h2>
+            My Skills
+          </h2>
 
         </div>
 
@@ -480,275 +680,111 @@ const AppContainer = () => {
         <div className="skill-main">
 
 
-          {/* Technical Skills */}
+          {/* TECHNICAL SKILLS */}
 
           <div className="skill-left">
 
-            <h3>Technical Skills</h3>
+            <h3>
+              Technical Skills
+            </h3>
 
 
-            <div className="skill-bar">
+            <Skill
+              name="Dot Net C#"
+              percentage="99%"
+              className="html"
+            />
 
-              <div className="info">
 
-                <p>Dot Net C#</p>
+            <Skill
+              name="Microsoft SQL Server"
+              percentage="100%"
+              className="css"
+            />
 
-                <p>99%</p>
 
-              </div>
+            <Skill
+              name="Python"
+              percentage="87%"
+              className="bootstrap"
+            />
 
-              <div className="bar">
 
-                <span className="html"></span>
+            <Skill
+              name="HTML / CSS / Bootstrap / Tailwind"
+              percentage="100%"
+              className="tailwind"
+            />
 
-              </div>
 
-            </div>
+            <Skill
+              name="JavaScript"
+              percentage="74%"
+              className="javascript"
+            />
 
 
-            <div className="skill-bar">
+            <Skill
+              name="React.js"
+              percentage="99%"
+              className="bootstrap"
+            />
 
-              <div className="info">
 
-                <p>Microsoft SQL Server</p>
+            <Skill
+              name="Java"
+              percentage="85%"
+              className="bootstrap"
+            />
 
-                <p>100%</p>
 
-              </div>
+            <Skill
+              name="Oracle / PL/SQL"
+              percentage="82%"
+              className="bootstrap"
+            />
 
-              <div className="bar">
 
-                <span className="css"></span>
+            <Skill
+              name="Node.js / Express.js"
+              percentage="70%"
+              className="bootstrap"
+            />
 
-              </div>
 
-            </div>
-
-
-            <div className="skill-bar">
-
-              <div className="info">
-
-                <p>Python</p>
-
-                <p>87%</p>
-
-              </div>
-
-              <div className="bar">
-
-                <span className="bootstrap"></span>
-
-              </div>
-
-            </div>
-
-
-            <div className="skill-bar">
-
-              <div className="info">
-
-                <p>HTML / CSS / Bootstrap / Tailwind</p>
-
-                <p>100%</p>
-
-              </div>
-
-              <div className="bar">
-
-                <span className="tailwind"></span>
-
-              </div>
-
-            </div>
-
-
-            <div className="skill-bar">
-
-              <div className="info">
-
-                <p>JavaScript</p>
-
-                <p>74%</p>
-
-              </div>
-
-              <div className="bar">
-
-                <span className="javascript"></span>
-
-              </div>
-
-            </div>
-
-
-            <div className="skill-bar">
-
-              <div className="info">
-
-                <p>React.js</p>
-
-                <p>99%</p>
-
-              </div>
-
-              <div className="bar">
-
-                <span className="bootstrap"></span>
-
-              </div>
-
-            </div>
-
-
-            <div className="skill-bar">
-
-              <div className="info">
-
-                <p>Java</p>
-
-                <p>85%</p>
-
-              </div>
-
-              <div className="bar">
-
-                <span className="bootstrap"></span>
-
-              </div>
-
-            </div>
-
-
-            <div className="skill-bar">
-
-              <div className="info">
-
-                <p>Oracle / PL/SQL</p>
-
-                <p>82%</p>
-
-              </div>
-
-              <div className="bar">
-
-                <span className="bootstrap"></span>
-
-              </div>
-
-            </div>
-
-
-            <div className="skill-bar">
-
-              <div className="info">
-
-                <p>Node.js / Express.js</p>
-
-                <p>70%</p>
-
-              </div>
-
-              <div className="bar">
-
-                <span className="bootstrap"></span>
-
-              </div>
-
-            </div>
-
-
-            <div className="skill-bar">
-
-              <div className="info">
-
-                <p>AI / ML</p>
-
-                <p>87%</p>
-
-              </div>
-
-              <div className="bar">
-
-                <span className="bootstrap"></span>
-
-              </div>
-
-            </div>
+            <Skill
+              name="AI / ML"
+              percentage="87%"
+              className="bootstrap"
+            />
 
           </div>
 
 
-          {/* Professional Skills */}
+          {/* PROFESSIONAL SKILLS */}
 
           <div className="skill-right">
 
-            <h3>Professional Skills</h3>
+            <h3>
+              Professional Skills
+            </h3>
 
 
             <div className="radial-bars">
 
 
-              <div className="radial-bar">
-
-                <svg viewBox="0 0 200 200">
-
-                  <circle
-                    className="progress-bar"
-                    cx="100"
-                    cy="100"
-                    r="80"
-                  />
-
-                  <circle
-                    className="path path-1"
-                    cx="100"
-                    cy="100"
-                    r="80"
-                  />
-
-                </svg>
-
-                <div className="Percentage">
-                  90%
-                </div>
-
-                <div className="text">
-                  Creativity
-                </div>
-
-              </div>
+              <RadialSkill
+                percentage="90%"
+                text="Creativity"
+                path="path-1"
+              />
 
 
-              <div className="radial-bar">
-
-                <svg viewBox="0 0 200 200">
-
-                  <circle
-                    className="progress-bar"
-                    cx="100"
-                    cy="100"
-                    r="80"
-                  />
-
-                  <circle
-                    className="path path-2"
-                    cx="100"
-                    cy="100"
-                    r="80"
-                  />
-
-                </svg>
-
-                <div className="Percentage">
-                  65%
-                </div>
-
-                <div className="text">
-                  Communication
-                </div>
-
-              </div>
+              <RadialSkill
+                percentage="65%"
+                text="Communication"
+                path="path-2"
+              />
 
             </div>
 
@@ -756,67 +792,18 @@ const AppContainer = () => {
             <div className="radial-bars">
 
 
-              <div className="radial-bar">
-
-                <svg viewBox="0 0 200 200">
-
-                  <circle
-                    className="progress-bar"
-                    cx="100"
-                    cy="100"
-                    r="80"
-                  />
-
-                  <circle
-                    className="path path-3"
-                    cx="100"
-                    cy="100"
-                    r="80"
-                  />
-
-                </svg>
-
-                <div className="Percentage">
-                  75%
-                </div>
-
-                <div className="text">
-                  Problem Solving
-                </div>
-
-              </div>
+              <RadialSkill
+                percentage="75%"
+                text="Problem Solving"
+                path="path-3"
+              />
 
 
-              <div className="radial-bar">
-
-                <svg viewBox="0 0 200 200">
-
-                  <circle
-                    className="progress-bar"
-                    cx="100"
-                    cy="100"
-                    r="80"
-                  />
-
-                  <circle
-                    className="path path-3"
-                    cx="100"
-                    cy="100"
-                    r="80"
-                  />
-
-                </svg>
-
-                <div className="Percentage">
-                  85%
-                </div>
-
-                <div className="text">
-                  Team Work
-                </div>
-
-              </div>
-
+              <RadialSkill
+                percentage="85%"
+                text="Team Work"
+                path="path-3"
+              />
 
             </div>
 
@@ -827,27 +814,39 @@ const AppContainer = () => {
       </section>
 
 
-      {/* ================= PORTFOLIO ================= */}
+      {/* =====================================
+          PORTFOLIO
+      ====================================== */}
 
-      <section id="portfolio">
+      <section
+        id="portfolio"
+        data-section="portfolio"
+      >
 
         <PortfolioSection />
 
       </section>
 
 
-      {/* ================= CONTACT ================= */}
+      {/* =====================================
+          CONTACT
+      ====================================== */}
 
       <section
         id="contact"
+        data-section="contact"
         className="contact"
       >
 
         <div className="main-text">
 
-          <span>Ask me a question</span>
+          <span>
+            Ask me a question
+          </span>
 
-          <h2>Contact Me</h2>
+          <h2>
+            Contact Me
+          </h2>
 
         </div>
 
@@ -857,34 +856,134 @@ const AppContainer = () => {
       </section>
 
 
-      {/* ================= FOOTER ================= */}
+      {/* =====================================
+          FOOTER
+      ====================================== */}
 
       <footer>
 
         <p>
-          Copyright &copy; 2024 by Fida Khan Developer
-          {" || "}
-          All Rights Reserved.
+          Copyright &copy; 2024 by Fida Khan
+          Developer || All Rights Reserved.
         </p>
 
 
         <a
-          href="#home"
+          href="#"
           title="Go to Home"
+          onClick={(e) => {
+
+            e.preventDefault();
+
+            scrollToSection("home");
+
+          }}
         >
+
           <i className="bx bx-up-arrow-alt"></i>
+
         </a>
 
       </footer>
 
     </>
   );
-};
+}
 
 
-/* =====================================================
-   REACT ROUTER
-===================================================== */
+// ==========================================
+// SKILL COMPONENT
+// ==========================================
+
+function Skill({
+  name,
+  percentage,
+  className
+}) {
+
+  return (
+
+    <div className="skill-bar">
+
+      <div className="info">
+
+        <p>
+          {name}
+        </p>
+
+        <p>
+          {percentage}
+        </p>
+
+      </div>
+
+
+      <div className="bar">
+
+        <span className={className}></span>
+
+      </div>
+
+    </div>
+
+  );
+}
+
+
+// ==========================================
+// RADIAL SKILL COMPONENT
+// ==========================================
+
+function RadialSkill({
+  percentage,
+  text,
+  path
+}) {
+
+  return (
+
+    <div className="radial-bar">
+
+      <svg
+        viewBox="0 0 200 200"
+      >
+
+        <circle
+          className="progress-bar"
+          cx="100"
+          cy="100"
+          r="80"
+        />
+
+
+        <circle
+          className={`path ${path}`}
+          cx="100"
+          cy="100"
+          r="80"
+        />
+
+      </svg>
+
+
+      <div className="Percentage">
+        {percentage}
+      </div>
+
+
+      <div className="text">
+        {text}
+      </div>
+
+    </div>
+
+  );
+}
+
+
+// ==========================================
+// REACT ROUTER
+// ==========================================
 
 const root = ReactDOM.createRoot(
   document.getElementById("root")
@@ -899,7 +998,7 @@ root.render(
 
       <Routes>
 
-        {/* HOME / MAIN PORTFOLIO */}
+        {/* MAIN PORTFOLIO */}
 
         <Route
           path="/"
@@ -913,7 +1012,6 @@ root.render(
           path="/education"
           element={<Education />}
         />
-
 
       </Routes>
 
