@@ -62,22 +62,61 @@ const AppContainer = () => {
     <>
       <App />
       {/* NAVBAR-SECTION */}
-      <header>
-        <div className='logo'>
-          <span>Fida</span>Khan.
-        </div>
-       <ul className={`navList ${isMenuOpen ? 'open' : ''}`}>
-  <li><a href="#home">Home</a></li>
-  <li><a href="#about">About</a></li>
-  <li><a href="#services">Services</a></li>
-  <li><a href="#skills">Skills</a></li>
-  <li><Link to="/education">Education</Link></li>
-  <li><a href="#portfolio">Portfolio</a></li>
-  <li><a href="#contact">Contact</a></li>
-</ul>
+   <header>
+  <a href="#home" className="logo">
+    FidaKhan.
+  </a>
 
-        <div id="menu-icon" className={`bx ${isMenuOpen ? 'bx-x' : 'bx-menu'}`} onClick={handleClick}></div>
-      </header>
+  <ul className={`navList ${isMenuOpen ? "open" : ""}`}>
+    <li>
+      <a href="#home" onClick={() => setIsMenuOpen(false)}>
+        Home
+      </a>
+    </li>
+
+    <li>
+      <a href="#about" onClick={() => setIsMenuOpen(false)}>
+        About
+      </a>
+    </li>
+
+    <li>
+      <a href="#services" onClick={() => setIsMenuOpen(false)}>
+        Services
+      </a>
+    </li>
+
+    <li>
+      <a href="#skills" onClick={() => setIsMenuOpen(false)}>
+        Skills
+      </a>
+    </li>
+
+    <li>
+      <a href="#portfolio" onClick={() => setIsMenuOpen(false)}>
+        Portfolio
+      </a>
+    </li>
+
+    <li>
+      <a href="#contact" onClick={() => setIsMenuOpen(false)}>
+        Contact
+      </a>
+    </li>
+
+    <li>
+      <Link to="/education" onClick={() => setIsMenuOpen(false)}>
+        Education
+      </Link>
+    </li>
+  </ul>
+
+  <div
+    id="menu-icon"
+    className={`bx ${isMenuOpen ? "bx-x" : "bx-menu"}`}
+    onClick={handleClick}
+  ></div>
+</header>
       
           {/* HOME-SECTION */}
 
