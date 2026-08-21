@@ -32,15 +32,14 @@ import {
 
 function AppContainer() {
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] =
+    useState(false);
 
   const location = useLocation();
 
   const navigate = useNavigate();
 
-  // Stores the section that should be opened
-  // after returning from another page.
-  const pendingSection = useRef(null);
+  const sectionToOpen = useRef(null);
 
 
   // =====================================================
@@ -48,12 +47,16 @@ function AppContainer() {
   // =====================================================
 
   const handleClick = () => {
-    setIsMenuOpen((prev) => !prev);
+
+    setIsMenuOpen((previous) => !previous);
+
   };
 
 
   const closeMenu = () => {
+
     setIsMenuOpen(false);
+
   };
 
 
@@ -61,41 +64,74 @@ function AppContainer() {
   // SCROLL TO SECTION
   // =====================================================
 
-  const scrollToSection = (sectionId) => {
+  const scrollToSection = (
+    sectionId,
+    smooth = true
+  ) => {
 
     const element =
       document.getElementById(sectionId);
 
     if (!element) {
-      return;
+
+      console.log(
+        `Section not found: ${sectionId}`
+      );
+
+      return false;
+
     }
+
 
     const header =
       document.querySelector("header");
+
 
     const headerHeight =
       header
         ? header.offsetHeight
         : 0;
 
-    const elementPosition =
-      element.getBoundingClientRect().top +
-      window.scrollY;
 
-    const offsetPosition =
-      elementPosition - headerHeight - 20;
+    const elementTop =
+      element.getBoundingClientRect().top;
+
+
+    const scrollTop =
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      0;
+
+
+    const targetPosition =
+      elementTop +
+      scrollTop -
+      headerHeight -
+      20;
 
 
     window.scrollTo({
-      top: Math.max(offsetPosition, 0),
-      behavior: "smooth",
+
+      top: Math.max(
+        targetPosition,
+        0
+      ),
+
+      behavior:
+        smooth
+          ? "smooth"
+          : "auto",
+
     });
+
+
+    return true;
 
   };
 
 
   // =====================================================
-  // SECTION NAVIGATION
+  // NAVIGATION
   // =====================================================
 
   const goToSection = (sectionId) => {
@@ -104,31 +140,38 @@ function AppContainer() {
 
 
     // ---------------------------------------------------
-    // If we are on Education page
+    // We are already on the portfolio
     // ---------------------------------------------------
 
-    if (location.pathname !== "/") {
+    if (location.pathname === "/") {
 
-      pendingSection.current =
-        sectionId;
-
-      navigate("/");
+      scrollToSection(
+        sectionId,
+        true
+      );
 
       return;
+
     }
 
 
     // ---------------------------------------------------
-    // Already on portfolio page
+    // We are on another page, e.g. Education
     // ---------------------------------------------------
 
-    scrollToSection(sectionId);
+    sectionToOpen.current =
+      sectionId;
+
+
+    navigate("/", {
+      replace: false,
+    });
 
   };
 
 
   // =====================================================
-  // SCROLL AFTER RETURNING FROM EDUCATION
+  // AFTER RETURNING TO PORTFOLIO
   // =====================================================
 
   useEffect(() => {
@@ -138,40 +181,73 @@ function AppContainer() {
     }
 
 
-    if (!pendingSection.current) {
+    if (!sectionToOpen.current) {
       return;
     }
 
 
     const sectionId =
-      pendingSection.current;
+      sectionToOpen.current;
 
 
-    pendingSection.current = null;
+    sectionToOpen.current = null;
 
 
-    // Give React time to render the portfolio.
-    const timer = setTimeout(() => {
+    let attempts = 0;
 
-      scrollToSection(sectionId);
-
-    }, 100);
+    const maxAttempts = 20;
 
 
-    return () => {
-      clearTimeout(timer);
+    const tryScroll = () => {
+
+      attempts++;
+
+
+      const element =
+        document.getElementById(
+          sectionId
+        );
+
+
+      if (element) {
+
+        scrollToSection(
+          sectionId,
+          true
+        );
+
+        return;
+
+      }
+
+
+      if (attempts < maxAttempts) {
+
+        setTimeout(
+          tryScroll,
+          50
+        );
+
+      }
+
     };
+
+
+    setTimeout(
+      tryScroll,
+      50
+    );
+
 
   }, [location.pathname]);
 
 
   // =====================================================
-  // ACTIVE MENU + STICKY HEADER
+  // ACTIVE MENU
   // =====================================================
 
   useEffect(() => {
 
-    // Only run on portfolio page.
     if (location.pathname !== "/") {
       return;
     }
@@ -181,15 +257,15 @@ function AppContainer() {
       document.querySelector("header");
 
 
-    const sections =
+    const menuLinks =
       document.querySelectorAll(
-        "main section[id]"
+        ".section-link"
       );
 
 
-    const menuLinks =
+    const sections =
       document.querySelectorAll(
-        "header .section-link"
+        "main section[id]"
       );
 
 
@@ -197,21 +273,32 @@ function AppContainer() {
       !sections.length ||
       !menuLinks.length
     ) {
+
       return;
+
     }
 
 
-    const activeMenu = () => {
+    const updateActiveMenu = () => {
 
-      let currentSection = "home";
+      let currentSection =
+        "home";
+
+
+      const scrollPosition =
+        window.scrollY + 200;
 
 
       sections.forEach((section) => {
 
         const sectionTop =
-          section.getBoundingClientRect().top;
+          section.offsetTop;
 
-        if (sectionTop <= 180) {
+
+        if (
+          scrollPosition >=
+          sectionTop
+        ) {
 
           currentSection =
             section.id;
@@ -226,6 +313,7 @@ function AppContainer() {
         link.classList.remove(
           "active"
         );
+
 
         if (
           link.dataset.section ===
@@ -247,26 +335,39 @@ function AppContainer() {
 
       if (header) {
 
-        header.classList.toggle(
-          "sticky",
+        if (
           window.scrollY > 50
-        );
+        ) {
+
+          header.classList.add(
+            "sticky"
+          );
+
+        } else {
+
+          header.classList.remove(
+            "sticky"
+          );
+
+        }
 
       }
 
-      activeMenu();
+
+      updateActiveMenu();
 
     };
 
 
-    // Initial state
     handleScroll();
 
 
     window.addEventListener(
       "scroll",
       handleScroll,
-      { passive: true }
+      {
+        passive: true,
+      }
     );
 
 
@@ -283,40 +384,42 @@ function AppContainer() {
 
 
   // =====================================================
-  // RETURN
+  // HEADER
   // =====================================================
 
   return (
     <>
-      {/* =================================================
-          HEADER
-      ================================================= */}
-
       <header>
 
         {/* LOGO */}
 
-        <div
+        <button
+          type="button"
           className="logo"
           onClick={() =>
             goToSection("home")
           }
-          style={{
-            cursor: "pointer",
-          }}
         >
-          <span>Fida</span>Khan.
-        </div>
+
+          <span>
+            Fida
+          </span>
+
+          Khan.
+
+        </button>
 
 
-        {/* =================================================
-            NAVIGATION
-        ================================================= */}
+        {/* NAVIGATION */}
 
         <ul
-          className={`navList ${
-            isMenuOpen ? "open" : ""
-          }`}
+          className={
+            `navList ${
+              isMenuOpen
+                ? "open"
+                : ""
+            }`
+          }
         >
 
           {/* HOME */}
@@ -443,19 +546,19 @@ function AppContainer() {
         </ul>
 
 
-        {/* =================================================
-            MOBILE MENU BUTTON
-        ================================================= */}
+        {/* MOBILE MENU */}
 
         <button
           type="button"
           id="menu-icon"
-          aria-label="Toggle menu"
-          className={`bx ${
-            isMenuOpen
-              ? "bx-x"
-              : "bx-menu"
-          }`}
+          aria-label="Open menu"
+          className={
+            `bx ${
+              isMenuOpen
+                ? "bx-x"
+                : "bx-menu"
+            }`
+          }
           onClick={handleClick}
         />
 
@@ -531,12 +634,12 @@ function AppContainer() {
             </p>
 
 
-            {/* BUTTONS */}
-
             <div className="btn-box">
 
               <a
-                href={`${process.env.PUBLIC_URL}/Fidai.pdf`}
+                href={
+                  `${process.env.PUBLIC_URL}/Fidai.pdf`
+                }
                 download="Fida Khan CV.pdf"
                 className="btn"
               >
@@ -553,8 +656,6 @@ function AppContainer() {
 
             </div>
 
-
-            {/* SOCIAL ICONS */}
 
             <div className="social-icons">
 
@@ -610,14 +711,14 @@ function AppContainer() {
           </div>
 
 
-          {/* HOME IMAGE */}
-
           <div className="home-image">
 
             <div className="img-box">
 
               <img
-                src={`${process.env.PUBLIC_URL}/img/4.png`}
+                src={
+                  `${process.env.PUBLIC_URL}/img/4.png`
+                }
                 alt="Fida Khan"
                 className="profile-img"
               />
@@ -641,7 +742,9 @@ function AppContainer() {
           <div className="img-box">
 
             <img
-              src={`${process.env.PUBLIC_URL}/img/4.png`}
+              src={
+                `${process.env.PUBLIC_URL}/img/4.png`
+              }
               alt="Fida Khan"
               className="profile-img"
             />
@@ -655,11 +758,9 @@ function AppContainer() {
               About Me
             </h2>
 
-
             <h3>
               A story of good
             </h3>
-
 
             <p>
               My name is Fida Khan, and I am a
@@ -750,8 +851,6 @@ function AppContainer() {
 
           <div className="section_services">
 
-            {/* DOT NET */}
-
             <div className="service-box">
 
               <i className="bx bxs-layer service-icon" />
@@ -772,8 +871,6 @@ function AppContainer() {
             </div>
 
 
-            {/* WEB DESIGN */}
-
             <div className="service-box">
 
               <i className="bx bx-desktop service-icon" />
@@ -792,8 +889,6 @@ function AppContainer() {
 
             </div>
 
-
-            {/* REACT */}
 
             <div className="service-box">
 
@@ -842,8 +937,6 @@ function AppContainer() {
 
           <div className="skill-main">
 
-            {/* TECHNICAL SKILLS */}
-
             <div className="skill-left">
 
               <h3>
@@ -851,152 +944,68 @@ function AppContainer() {
               </h3>
 
 
-              <div className="skill-bar">
+              <Skill
+                name="Dot Net C#"
+                percent="99%"
+                className="html"
+              />
 
-                <div className="info">
-                  <p>Dot Net C#</p>
-                  <p>99%</p>
-                </div>
+              <Skill
+                name="Microsoft SQL Server"
+                percent="100%"
+                className="css"
+              />
 
-                <div className="bar">
-                  <span className="html" />
-                </div>
+              <Skill
+                name="Python"
+                percent="87%"
+                className="bootstrap"
+              />
 
-              </div>
+              <Skill
+                name="HTML/CSS/Bootstrap/Tailwind"
+                percent="100%"
+                className="tailwind"
+              />
 
+              <Skill
+                name="JavaScript"
+                percent="74%"
+                className="javascript"
+              />
 
-              <div className="skill-bar">
+              <Skill
+                name="React.js"
+                percent="99%"
+                className="bootstrap"
+              />
 
-                <div className="info">
-                  <p>Microsoft SQL Server</p>
-                  <p>100%</p>
-                </div>
+              <Skill
+                name="Java"
+                percent="85%"
+                className="bootstrap"
+              />
 
-                <div className="bar">
-                  <span className="css" />
-                </div>
+              <Skill
+                name="Oracle / PL/SQL"
+                percent="82%"
+                className="bootstrap"
+              />
 
-              </div>
+              <Skill
+                name="Node.js / Express.js"
+                percent="70%"
+                className="bootstrap"
+              />
 
-
-              <div className="skill-bar">
-
-                <div className="info">
-                  <p>Python</p>
-                  <p>87%</p>
-                </div>
-
-                <div className="bar">
-                  <span className="bootstrap" />
-                </div>
-
-              </div>
-
-
-              <div className="skill-bar">
-
-                <div className="info">
-                  <p>
-                    HTML/CSS/Bootstrap/Tailwind
-                  </p>
-
-                  <p>100%</p>
-                </div>
-
-                <div className="bar">
-                  <span className="tailwind" />
-                </div>
-
-              </div>
-
-
-              <div className="skill-bar">
-
-                <div className="info">
-                  <p>JavaScript</p>
-                  <p>74%</p>
-                </div>
-
-                <div className="bar">
-                  <span className="javascript" />
-                </div>
-
-              </div>
-
-
-              <div className="skill-bar">
-
-                <div className="info">
-                  <p>React.js</p>
-                  <p>99%</p>
-                </div>
-
-                <div className="bar">
-                  <span className="bootstrap" />
-                </div>
-
-              </div>
-
-
-              <div className="skill-bar">
-
-                <div className="info">
-                  <p>Java</p>
-                  <p>85%</p>
-                </div>
-
-                <div className="bar">
-                  <span className="bootstrap" />
-                </div>
-
-              </div>
-
-
-              <div className="skill-bar">
-
-                <div className="info">
-                  <p>Oracle / PL/SQL</p>
-                  <p>82%</p>
-                </div>
-
-                <div className="bar">
-                  <span className="bootstrap" />
-                </div>
-
-              </div>
-
-
-              <div className="skill-bar">
-
-                <div className="info">
-                  <p>Node.js / Express.js</p>
-                  <p>70%</p>
-                </div>
-
-                <div className="bar">
-                  <span className="bootstrap" />
-                </div>
-
-              </div>
-
-
-              <div className="skill-bar">
-
-                <div className="info">
-                  <p>AI / ML</p>
-                  <p>87%</p>
-                </div>
-
-                <div className="bar">
-                  <span className="bootstrap" />
-                </div>
-
-              </div>
+              <Skill
+                name="AI / ML"
+                percent="87%"
+                className="bootstrap"
+              />
 
             </div>
 
-
-            {/* PROFESSIONAL SKILLS */}
 
             <div className="skill-right">
 
@@ -1007,132 +1016,34 @@ function AppContainer() {
 
               <div className="radial-bars">
 
-                <div className="radial-bar">
+                <RadialSkill
+                  percentage="90%"
+                  label="Creativity"
+                  path="path-1"
+                />
 
-                  <svg viewBox="0 0 200 200">
-
-                    <circle
-                      className="progress-bar"
-                      cx="100"
-                      cy="100"
-                      r="80"
-                    />
-
-                    <circle
-                      className="path path-1"
-                      cx="100"
-                      cy="100"
-                      r="80"
-                    />
-
-                  </svg>
-
-                  <div className="Percentage">
-                    90%
-                  </div>
-
-                  <div className="text">
-                    Creativity
-                  </div>
-
-                </div>
-
-
-                <div className="radial-bar">
-
-                  <svg viewBox="0 0 200 200">
-
-                    <circle
-                      className="progress-bar"
-                      cx="100"
-                      cy="100"
-                      r="80"
-                    />
-
-                    <circle
-                      className="path path-2"
-                      cx="100"
-                      cy="100"
-                      r="80"
-                    />
-
-                  </svg>
-
-                  <div className="Percentage">
-                    65%
-                  </div>
-
-                  <div className="text">
-                    Communication
-                  </div>
-
-                </div>
+                <RadialSkill
+                  percentage="65%"
+                  label="Communication"
+                  path="path-2"
+                />
 
               </div>
 
 
               <div className="radial-bars">
 
-                <div className="radial-bar">
+                <RadialSkill
+                  percentage="75%"
+                  label="Problem Solving"
+                  path="path-3"
+                />
 
-                  <svg viewBox="0 0 200 200">
-
-                    <circle
-                      className="progress-bar"
-                      cx="100"
-                      cy="100"
-                      r="80"
-                    />
-
-                    <circle
-                      className="path path-3"
-                      cx="100"
-                      cy="100"
-                      r="80"
-                    />
-
-                  </svg>
-
-                  <div className="Percentage">
-                    75%
-                  </div>
-
-                  <div className="text">
-                    Problem Solving
-                  </div>
-
-                </div>
-
-
-                <div className="radial-bar">
-
-                  <svg viewBox="0 0 200 200">
-
-                    <circle
-                      className="progress-bar"
-                      cx="100"
-                      cy="100"
-                      r="80"
-                    />
-
-                    <circle
-                      className="path path-3"
-                      cx="100"
-                      cy="100"
-                      r="80"
-                    />
-
-                  </svg>
-
-                  <div className="Percentage">
-                    85%
-                  </div>
-
-                  <div className="text">
-                    Team Work
-                  </div>
-
-                </div>
+                <RadialSkill
+                  percentage="85%"
+                  label="Team Work"
+                  path="path-3"
+                />
 
               </div>
 
@@ -1218,6 +1129,98 @@ function AppContainer() {
 
 
 // =====================================================
+// SKILL COMPONENT
+// =====================================================
+
+function Skill({
+  name,
+  percent,
+  className,
+}) {
+
+  return (
+
+    <div className="skill-bar">
+
+      <div className="info">
+
+        <p>
+          {name}
+        </p>
+
+        <p>
+          {percent}
+        </p>
+
+      </div>
+
+
+      <div className="bar">
+
+        <span
+          className={className}
+        />
+
+      </div>
+
+    </div>
+
+  );
+
+}
+
+
+// =====================================================
+// RADIAL SKILL
+// =====================================================
+
+function RadialSkill({
+  percentage,
+  label,
+  path,
+}) {
+
+  return (
+
+    <div className="radial-bar">
+
+      <svg viewBox="0 0 200 200">
+
+        <circle
+          className="progress-bar"
+          cx="100"
+          cy="100"
+          r="80"
+        />
+
+
+        <circle
+          className={`path ${path}`}
+          cx="100"
+          cy="100"
+          r="80"
+        />
+
+      </svg>
+
+
+      <div className="Percentage">
+        {percentage}
+      </div>
+
+
+      <div className="text">
+        {label}
+      </div>
+
+    </div>
+
+  );
+
+}
+
+
+// =====================================================
 // ROOT
 // =====================================================
 
@@ -1235,15 +1238,11 @@ root.render(
 
       <Routes>
 
-        {/* MAIN PORTFOLIO */}
-
         <Route
           path="/"
           element={<AppContainer />}
         />
 
-
-        {/* EDUCATION */}
 
         <Route
           path="/education"
