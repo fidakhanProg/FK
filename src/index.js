@@ -1,6 +1,5 @@
 import React, {
   useEffect,
-  useRef,
   useState,
 } from "react";
 
@@ -22,7 +21,6 @@ import {
   Route,
   Link,
   useLocation,
-  useNavigate,
 } from "react-router-dom";
 
 
@@ -37,10 +35,6 @@ function AppContainer() {
 
   const location = useLocation();
 
-  const navigate = useNavigate();
-
-  const sectionToOpen = useRef(null);
-
 
   // =====================================================
   // MOBILE MENU
@@ -48,7 +42,9 @@ function AppContainer() {
 
   const handleClick = () => {
 
-    setIsMenuOpen((previous) => !previous);
+    setIsMenuOpen(
+      (previous) => !previous
+    );
 
   };
 
@@ -70,21 +66,27 @@ function AppContainer() {
   ) => {
 
     const element =
-      document.getElementById(sectionId);
+      document.getElementById(
+        sectionId
+      );
+
 
     if (!element) {
 
       console.log(
-        `Section not found: ${sectionId}`
+        "Section not found:",
+        sectionId
       );
 
-      return false;
+      return;
 
     }
 
 
     const header =
-      document.querySelector("header");
+      document.querySelector(
+        "header"
+      );
 
 
     const headerHeight =
@@ -93,19 +95,19 @@ function AppContainer() {
         : 0;
 
 
-    const elementTop =
+    const elementPosition =
       element.getBoundingClientRect().top;
 
 
-    const scrollTop =
+    const currentScroll =
       window.pageYOffset ||
       document.documentElement.scrollTop ||
       0;
 
 
-    const targetPosition =
-      elementTop +
-      scrollTop -
+    const position =
+      elementPosition +
+      currentScroll -
       headerHeight -
       20;
 
@@ -113,7 +115,7 @@ function AppContainer() {
     window.scrollTo({
 
       top: Math.max(
-        targetPosition,
+        position,
         0
       ),
 
@@ -124,122 +126,62 @@ function AppContainer() {
 
     });
 
-
-    return true;
-
   };
 
 
   // =====================================================
-  // NAVIGATION
+  // GO TO SECTION
   // =====================================================
 
-  const goToSection = (sectionId) => {
+  const goToSection = (
+    sectionId
+  ) => {
 
     closeMenu();
 
 
     // ---------------------------------------------------
-    // We are already on the portfolio
+    // If we are on Education page
     // ---------------------------------------------------
 
-    if (location.pathname === "/") {
+    if (
+      location.pathname !== "/"
+    ) {
 
-      scrollToSection(
-        sectionId,
-        true
-      );
+      /*
+        Go back to the portfolio first.
 
-      return;
+        We use a small delay because React needs
+        to render the portfolio before we search
+        for the section.
+      */
 
-    }
+      window.location.hash = "#/";
 
-
-    // ---------------------------------------------------
-    // We are on another page, e.g. Education
-    // ---------------------------------------------------
-
-    sectionToOpen.current =
-      sectionId;
-
-
-    navigate("/", {
-      replace: false,
-    });
-
-  };
-
-
-  // =====================================================
-  // AFTER RETURNING TO PORTFOLIO
-  // =====================================================
-
-  useEffect(() => {
-
-    if (location.pathname !== "/") {
-      return;
-    }
-
-
-    if (!sectionToOpen.current) {
-      return;
-    }
-
-
-    const sectionId =
-      sectionToOpen.current;
-
-
-    sectionToOpen.current = null;
-
-
-    let attempts = 0;
-
-    const maxAttempts = 20;
-
-
-    const tryScroll = () => {
-
-      attempts++;
-
-
-      const element =
-        document.getElementById(
-          sectionId
-        );
-
-
-      if (element) {
+      setTimeout(() => {
 
         scrollToSection(
           sectionId,
           true
         );
 
-        return;
+      }, 300);
 
-      }
+      return;
 
-
-      if (attempts < maxAttempts) {
-
-        setTimeout(
-          tryScroll,
-          50
-        );
-
-      }
-
-    };
+    }
 
 
-    setTimeout(
-      tryScroll,
-      50
+    // ---------------------------------------------------
+    // Already on portfolio
+    // ---------------------------------------------------
+
+    scrollToSection(
+      sectionId,
+      true
     );
 
-
-  }, [location.pathname]);
+  };
 
 
   // =====================================================
@@ -248,24 +190,32 @@ function AppContainer() {
 
   useEffect(() => {
 
-    if (location.pathname !== "/") {
+    // Only run on portfolio page
+
+    if (
+      location.pathname !== "/"
+    ) {
+
       return;
+
     }
 
 
     const header =
-      document.querySelector("header");
-
-
-    const menuLinks =
-      document.querySelectorAll(
-        ".section-link"
+      document.querySelector(
+        "header"
       );
 
 
     const sections =
       document.querySelectorAll(
         "main section[id]"
+      );
+
+
+    const menuLinks =
+      document.querySelectorAll(
+        "header .section-link"
       );
 
 
@@ -286,47 +236,47 @@ function AppContainer() {
 
 
       const scrollPosition =
-        window.scrollY + 200;
+        window.scrollY + 250;
 
 
-      sections.forEach((section) => {
+      sections.forEach(
+        (section) => {
 
-        const sectionTop =
-          section.offsetTop;
+          if (
+            scrollPosition >=
+            section.offsetTop
+          ) {
 
+            currentSection =
+              section.id;
 
-        if (
-          scrollPosition >=
-          sectionTop
-        ) {
-
-          currentSection =
-            section.id;
+          }
 
         }
-
-      });
-
-
-      menuLinks.forEach((link) => {
-
-        link.classList.remove(
-          "active"
-        );
+      );
 
 
-        if (
-          link.dataset.section ===
-          currentSection
-        ) {
+      menuLinks.forEach(
+        (link) => {
 
-          link.classList.add(
+          link.classList.remove(
             "active"
           );
 
-        }
 
-      });
+          if (
+            link.dataset.section ===
+            currentSection
+          ) {
+
+            link.classList.add(
+              "active"
+            );
+
+          }
+
+        }
+      );
 
     };
 
@@ -380,7 +330,9 @@ function AppContainer() {
 
     };
 
-  }, [location.pathname]);
+  }, [
+    location.pathname
+  ]);
 
 
   // =====================================================
@@ -389,6 +341,11 @@ function AppContainer() {
 
   return (
     <>
+
+      {/* =================================================
+          HEADER
+      ================================================= */}
+
       <header>
 
         {/* LOGO */}
@@ -410,7 +367,9 @@ function AppContainer() {
         </button>
 
 
-        {/* NAVIGATION */}
+        {/* =================================================
+            NAVIGATION
+        ================================================= */}
 
         <ul
           className={
@@ -434,7 +393,9 @@ function AppContainer() {
                 goToSection("home")
               }
             >
+
               Home
+
             </button>
 
           </li>
@@ -452,7 +413,9 @@ function AppContainer() {
                 goToSection("about")
               }
             >
+
               About
+
             </button>
 
           </li>
@@ -470,7 +433,9 @@ function AppContainer() {
                 goToSection("services")
               }
             >
+
               Services
+
             </button>
 
           </li>
@@ -488,7 +453,9 @@ function AppContainer() {
                 goToSection("skills")
               }
             >
+
               Skills
+
             </button>
 
           </li>
@@ -506,7 +473,9 @@ function AppContainer() {
                 goToSection("portfolio")
               }
             >
+
               Portfolio
+
             </button>
 
           </li>
@@ -524,7 +493,9 @@ function AppContainer() {
                 goToSection("contact")
               }
             >
+
               Contact
+
             </button>
 
           </li>
@@ -538,7 +509,9 @@ function AppContainer() {
               to="/education"
               onClick={closeMenu}
             >
+
               Education
+
             </Link>
 
           </li>
@@ -546,12 +519,18 @@ function AppContainer() {
         </ul>
 
 
-        {/* MOBILE MENU */}
+        {/* =================================================
+            MOBILE MENU
+        ================================================= */}
 
         <button
           type="button"
           id="menu-icon"
-          aria-label="Open menu"
+          aria-label={
+            isMenuOpen
+              ? "Close menu"
+              : "Open menu"
+          }
           className={
             `bx ${
               isMenuOpen
@@ -570,6 +549,7 @@ function AppContainer() {
       ================================================= */}
 
       <main>
+
 
         {/* =================================================
             HOME
@@ -601,6 +581,7 @@ function AppContainer() {
                     autoStart: true,
                     loop: true,
                     delay: 40,
+
                     strings: [
                       "Software Engineer",
                       ".Net Developer",
@@ -609,6 +590,7 @@ function AppContainer() {
                       "AI Developer",
                       "SQL Developer",
                     ],
+
                   }}
                 />
 
@@ -618,6 +600,7 @@ function AppContainer() {
 
 
             <p>
+
               I am a passionate .NET Developer and
               Frontend Specialist with a knack for
               creating visually appealing and
@@ -631,8 +614,11 @@ function AppContainer() {
               I focus on clean code and engaging
               user experiences to deliver
               high-quality results.
+
             </p>
 
+
+            {/* BUTTONS */}
 
             <div className="btn-box">
 
@@ -643,7 +629,9 @@ function AppContainer() {
                 download="Fida Khan CV.pdf"
                 className="btn"
               >
+
                 Download CV
+
               </a>
 
 
@@ -651,11 +639,15 @@ function AppContainer() {
                 href="mailto:engrfidabettani@gmail.com"
                 className="btn"
               >
+
                 Hire Me Now!
+
               </a>
 
             </div>
 
+
+            {/* SOCIAL ICONS */}
 
             <div className="social-icons">
 
@@ -663,7 +655,9 @@ function AppContainer() {
                 href="mailto:engrfidabettani@gmail.com"
                 title="Email"
               >
+
                 <i className="bx bxs-envelope" />
+
               </a>
 
 
@@ -673,7 +667,9 @@ function AppContainer() {
                 rel="noopener noreferrer"
                 title="LinkedIn"
               >
+
                 <i className="bx bxl-linkedin" />
+
               </a>
 
 
@@ -683,7 +679,9 @@ function AppContainer() {
                 rel="noopener noreferrer"
                 title="GitHub"
               >
+
                 <i className="bx bxl-github" />
+
               </a>
 
 
@@ -693,7 +691,9 @@ function AppContainer() {
                 rel="noopener noreferrer"
                 title="Facebook"
               >
+
                 <i className="bx bxl-facebook" />
+
               </a>
 
 
@@ -703,13 +703,17 @@ function AppContainer() {
                 rel="noopener noreferrer"
                 title="TikTok"
               >
+
                 <i className="bx bxl-tiktok" />
+
               </a>
 
             </div>
 
           </div>
 
+
+          {/* HOME IMAGE */}
 
           <div className="home-image">
 
@@ -758,11 +762,14 @@ function AppContainer() {
               About Me
             </h2>
 
+
             <h3>
               A story of good
             </h3>
 
+
             <p>
+
               My name is Fida Khan, and I am a
               passionate Software Engineer and
               Full-Stack Developer focused on
@@ -820,6 +827,7 @@ function AppContainer() {
               and modern technologies to create
               reliable applications that deliver
               real value.
+
             </p>
 
           </div>
@@ -851,6 +859,9 @@ function AppContainer() {
 
           <div className="section_services">
 
+
+            {/* DOT NET */}
+
             <div className="service-box">
 
               <i className="bx bxs-layer service-icon" />
@@ -860,16 +871,20 @@ function AppContainer() {
               </h3>
 
               <p>
+
                 Leverage the power of .NET to build
                 robust, scalable applications tailored
                 to your business needs. I specialize
                 in creating high-performance web and
                 desktop applications with Microsoft
                 SQL Server integration.
+
               </p>
 
             </div>
 
+
+            {/* WEB DESIGN */}
 
             <div className="service-box">
 
@@ -880,15 +895,19 @@ function AppContainer() {
               </h3>
 
               <p>
+
                 Ensure your website looks great on
                 all devices with mobile-first design.
                 I create responsive websites using
                 CSS, Bootstrap, Tailwind, and modern
                 layout techniques.
+
               </p>
 
             </div>
 
+
+            {/* REACT */}
 
             <div className="service-box">
 
@@ -899,11 +918,13 @@ function AppContainer() {
               </h3>
 
               <p>
+
                 Unlock the potential of your web
                 applications with React.js. I create
                 responsive and engaging web
                 applications using React's
                 component-based architecture.
+
               </p>
 
             </div>
@@ -937,6 +958,9 @@ function AppContainer() {
 
           <div className="skill-main">
 
+
+            {/* TECHNICAL */}
+
             <div className="skill-left">
 
               <h3>
@@ -950,11 +974,13 @@ function AppContainer() {
                 className="html"
               />
 
+
               <Skill
                 name="Microsoft SQL Server"
                 percent="100%"
                 className="css"
               />
+
 
               <Skill
                 name="Python"
@@ -962,11 +988,13 @@ function AppContainer() {
                 className="bootstrap"
               />
 
+
               <Skill
                 name="HTML/CSS/Bootstrap/Tailwind"
                 percent="100%"
                 className="tailwind"
               />
+
 
               <Skill
                 name="JavaScript"
@@ -974,11 +1002,13 @@ function AppContainer() {
                 className="javascript"
               />
 
+
               <Skill
                 name="React.js"
                 percent="99%"
                 className="bootstrap"
               />
+
 
               <Skill
                 name="Java"
@@ -986,17 +1016,20 @@ function AppContainer() {
                 className="bootstrap"
               />
 
+
               <Skill
                 name="Oracle / PL/SQL"
                 percent="82%"
                 className="bootstrap"
               />
 
+
               <Skill
                 name="Node.js / Express.js"
                 percent="70%"
                 className="bootstrap"
               />
+
 
               <Skill
                 name="AI / ML"
@@ -1007,6 +1040,8 @@ function AppContainer() {
             </div>
 
 
+            {/* PROFESSIONAL */}
+
             <div className="skill-right">
 
               <h3>
@@ -1016,11 +1051,13 @@ function AppContainer() {
 
               <div className="radial-bars">
 
+
                 <RadialSkill
                   percentage="90%"
                   label="Creativity"
                   path="path-1"
                 />
+
 
                 <RadialSkill
                   percentage="65%"
@@ -1033,11 +1070,13 @@ function AppContainer() {
 
               <div className="radial-bars">
 
+
                 <RadialSkill
                   percentage="75%"
                   label="Problem Solving"
                   path="path-3"
                 />
+
 
                 <RadialSkill
                   percentage="85%"
@@ -1102,8 +1141,10 @@ function AppContainer() {
         <footer>
 
           <p>
+
             Copyright © 2024 by Fida Khan
             Developer || All Rights Reserved.
+
           </p>
 
 
@@ -1124,7 +1165,9 @@ function AppContainer() {
       </main>
 
     </>
+
   );
+
 }
 
 
@@ -1195,7 +1238,9 @@ function RadialSkill({
 
 
         <circle
-          className={`path ${path}`}
+          className={
+            `path ${path}`
+          }
           cx="100"
           cy="100"
           r="80"
@@ -1205,12 +1250,16 @@ function RadialSkill({
 
 
       <div className="Percentage">
+
         {percentage}
+
       </div>
 
 
       <div className="text">
+
         {label}
+
       </div>
 
     </div>
@@ -1226,7 +1275,9 @@ function RadialSkill({
 
 const root =
   ReactDOM.createRoot(
-    document.getElementById("root")
+    document.getElementById(
+      "root"
+    )
   );
 
 
@@ -1238,15 +1289,31 @@ root.render(
 
       <Routes>
 
+        {/* ONLY TWO ROUTES */}
+
         <Route
           path="/"
-          element={<AppContainer />}
+          element={
+            <AppContainer />
+          }
         />
 
 
         <Route
           path="/education"
-          element={<Education />}
+          element={
+            <Education />
+          }
+        />
+
+
+        {/* FALLBACK */}
+
+        <Route
+          path="*"
+          element={
+            <AppContainer />
+          }
         />
 
       </Routes>
