@@ -1,4 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import ReactDOM from "react-dom/client";
 
 import "./index.css";
@@ -17,6 +22,7 @@ import {
   Route,
   Link,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
 
@@ -29,6 +35,12 @@ function AppContainer() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const location = useLocation();
+
+  const navigate = useNavigate();
+
+  // Stores the section that should be opened
+  // after returning from another page.
+  const pendingSection = useRef(null);
 
 
   // =====================================================
@@ -46,61 +58,187 @@ function AppContainer() {
 
 
   // =====================================================
-  // SCROLL + ACTIVE MENU
+  // SCROLL TO SECTION
+  // =====================================================
+
+  const scrollToSection = (sectionId) => {
+
+    const element =
+      document.getElementById(sectionId);
+
+    if (!element) {
+      return;
+    }
+
+    const header =
+      document.querySelector("header");
+
+    const headerHeight =
+      header
+        ? header.offsetHeight
+        : 0;
+
+    const elementPosition =
+      element.getBoundingClientRect().top +
+      window.scrollY;
+
+    const offsetPosition =
+      elementPosition - headerHeight - 20;
+
+
+    window.scrollTo({
+      top: Math.max(offsetPosition, 0),
+      behavior: "smooth",
+    });
+
+  };
+
+
+  // =====================================================
+  // SECTION NAVIGATION
+  // =====================================================
+
+  const goToSection = (sectionId) => {
+
+    closeMenu();
+
+
+    // ---------------------------------------------------
+    // If we are on Education page
+    // ---------------------------------------------------
+
+    if (location.pathname !== "/") {
+
+      pendingSection.current =
+        sectionId;
+
+      navigate("/");
+
+      return;
+    }
+
+
+    // ---------------------------------------------------
+    // Already on portfolio page
+    // ---------------------------------------------------
+
+    scrollToSection(sectionId);
+
+  };
+
+
+  // =====================================================
+  // SCROLL AFTER RETURNING FROM EDUCATION
   // =====================================================
 
   useEffect(() => {
 
-    // Only run on main portfolio page
     if (location.pathname !== "/") {
       return;
     }
 
-    const header = document.querySelector("header");
+
+    if (!pendingSection.current) {
+      return;
+    }
+
+
+    const sectionId =
+      pendingSection.current;
+
+
+    pendingSection.current = null;
+
+
+    // Give React time to render the portfolio.
+    const timer = setTimeout(() => {
+
+      scrollToSection(sectionId);
+
+    }, 100);
+
+
+    return () => {
+      clearTimeout(timer);
+    };
+
+  }, [location.pathname]);
+
+
+  // =====================================================
+  // ACTIVE MENU + STICKY HEADER
+  // =====================================================
+
+  useEffect(() => {
+
+    // Only run on portfolio page.
+    if (location.pathname !== "/") {
+      return;
+    }
+
+
+    const header =
+      document.querySelector("header");
+
+
+    const sections =
+      document.querySelectorAll(
+        "main section[id]"
+      );
+
+
+    const menuLinks =
+      document.querySelectorAll(
+        "header .section-link"
+      );
+
+
+    if (
+      !sections.length ||
+      !menuLinks.length
+    ) {
+      return;
+    }
 
 
     const activeMenu = () => {
 
-      const sections = document.querySelectorAll(
-        "main section"
-      );
-
-      const menuLinks = document.querySelectorAll(
-        "header .section-link"
-      );
-
-      if (!sections.length || !menuLinks.length) {
-        return;
-      }
+      let currentSection = "home";
 
 
-      let currentSection = 0;
-
-
-      sections.forEach((section, index) => {
+      sections.forEach((section) => {
 
         const sectionTop =
-          section.offsetTop - 150;
+          section.getBoundingClientRect().top;
 
-        if (window.scrollY >= sectionTop) {
-          currentSection = index;
+        if (sectionTop <= 180) {
+
+          currentSection =
+            section.id;
+
         }
 
       });
 
 
       menuLinks.forEach((link) => {
-        link.classList.remove("active");
-      });
 
-
-      if (menuLinks[currentSection]) {
-
-        menuLinks[currentSection].classList.add(
+        link.classList.remove(
           "active"
         );
 
-      }
+        if (
+          link.dataset.section ===
+          currentSection
+        ) {
+
+          link.classList.add(
+            "active"
+          );
+
+        }
+
+      });
 
     };
 
@@ -116,30 +254,23 @@ function AppContainer() {
 
       }
 
+      activeMenu();
+
     };
 
 
-    activeMenu();
+    // Initial state
     handleScroll();
 
 
     window.addEventListener(
       "scroll",
-      activeMenu
-    );
-
-    window.addEventListener(
-      "scroll",
-      handleScroll
+      handleScroll,
+      { passive: true }
     );
 
 
     return () => {
-
-      window.removeEventListener(
-        "scroll",
-        activeMenu
-      );
 
       window.removeEventListener(
         "scroll",
@@ -149,59 +280,6 @@ function AppContainer() {
     };
 
   }, [location.pathname]);
-
-
-  // =====================================================
-  // SECTION NAVIGATION
-  // =====================================================
-
-  const goToSection = (sectionId) => {
-
-    closeMenu();
-
-
-    // If currently on Education page,
-    // return to portfolio first.
-    if (location.pathname !== "/") {
-
-      window.location.hash = "#/";
-
-      setTimeout(() => {
-
-        const element =
-          document.getElementById(sectionId);
-
-        if (element) {
-
-          element.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-
-        }
-
-      }, 150);
-
-      return;
-    }
-
-
-    // Already on portfolio page
-
-    const element =
-      document.getElementById(sectionId);
-
-
-    if (element) {
-
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-
-    }
-
-  };
 
 
   // =====================================================
@@ -218,7 +296,15 @@ function AppContainer() {
 
         {/* LOGO */}
 
-        <div className="logo">
+        <div
+          className="logo"
+          onClick={() =>
+            goToSection("home")
+          }
+          style={{
+            cursor: "pointer",
+          }}
+        >
           <span>Fida</span>Khan.
         </div>
 
@@ -240,6 +326,7 @@ function AppContainer() {
             <button
               type="button"
               className="section-link"
+              data-section="home"
               onClick={() =>
                 goToSection("home")
               }
@@ -257,6 +344,7 @@ function AppContainer() {
             <button
               type="button"
               className="section-link"
+              data-section="about"
               onClick={() =>
                 goToSection("about")
               }
@@ -274,6 +362,7 @@ function AppContainer() {
             <button
               type="button"
               className="section-link"
+              data-section="services"
               onClick={() =>
                 goToSection("services")
               }
@@ -291,6 +380,7 @@ function AppContainer() {
             <button
               type="button"
               className="section-link"
+              data-section="skills"
               onClick={() =>
                 goToSection("skills")
               }
@@ -308,6 +398,7 @@ function AppContainer() {
             <button
               type="button"
               className="section-link"
+              data-section="portfolio"
               onClick={() =>
                 goToSection("portfolio")
               }
@@ -325,6 +416,7 @@ function AppContainer() {
             <button
               type="button"
               className="section-link"
+              data-section="contact"
               onClick={() =>
                 goToSection("contact")
               }
@@ -355,8 +447,10 @@ function AppContainer() {
             MOBILE MENU BUTTON
         ================================================= */}
 
-        <div
+        <button
+          type="button"
           id="menu-icon"
+          aria-label="Toggle menu"
           className={`bx ${
             isMenuOpen
               ? "bx-x"
@@ -373,7 +467,6 @@ function AppContainer() {
       ================================================= */}
 
       <main>
-
 
         {/* =================================================
             HOME
@@ -405,7 +498,6 @@ function AppContainer() {
                     autoStart: true,
                     loop: true,
                     delay: 40,
-
                     strings: [
                       "Software Engineer",
                       ".Net Developer",
@@ -477,7 +569,7 @@ function AppContainer() {
               <a
                 href="https://www.linkedin.com/in/fida-khan-767110240/"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 title="LinkedIn"
               >
                 <i className="bx bxl-linkedin" />
@@ -487,7 +579,7 @@ function AppContainer() {
               <a
                 href="https://github.com/fidakhanProg"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 title="GitHub"
               >
                 <i className="bx bxl-github" />
@@ -497,7 +589,7 @@ function AppContainer() {
               <a
                 href="https://www.facebook.com/profile.php?id=100026060852750"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 title="Facebook"
               >
                 <i className="bx bxl-facebook" />
@@ -507,7 +599,7 @@ function AppContainer() {
               <a
                 href="https://www.tiktok.com/@thefkcircle"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 title="TikTok"
               >
                 <i className="bx bxl-tiktok" />
@@ -570,7 +662,6 @@ function AppContainer() {
 
 
             <p>
-
               My name is Fida Khan, and I am a
               passionate Software Engineer and
               Full-Stack Developer focused on
@@ -628,7 +719,6 @@ function AppContainer() {
               and modern technologies to create
               reliable applications that deliver
               real value.
-
             </p>
 
           </div>
@@ -659,7 +749,6 @@ function AppContainer() {
 
 
           <div className="section_services">
-
 
             {/* DOT NET */}
 
@@ -753,7 +842,6 @@ function AppContainer() {
 
           <div className="skill-main">
 
-
             {/* TECHNICAL SKILLS */}
 
             <div className="skill-left">
@@ -762,8 +850,6 @@ function AppContainer() {
                 Technical Skills
               </h3>
 
-
-              {/* .NET */}
 
               <div className="skill-bar">
 
@@ -779,8 +865,6 @@ function AppContainer() {
               </div>
 
 
-              {/* SQL */}
-
               <div className="skill-bar">
 
                 <div className="info">
@@ -794,8 +878,6 @@ function AppContainer() {
 
               </div>
 
-
-              {/* PYTHON */}
 
               <div className="skill-bar">
 
@@ -811,18 +893,14 @@ function AppContainer() {
               </div>
 
 
-              {/* HTML CSS */}
-
               <div className="skill-bar">
 
                 <div className="info">
-
                   <p>
                     HTML/CSS/Bootstrap/Tailwind
                   </p>
 
                   <p>100%</p>
-
                 </div>
 
                 <div className="bar">
@@ -832,18 +910,11 @@ function AppContainer() {
               </div>
 
 
-              {/* JAVASCRIPT */}
-
               <div className="skill-bar">
 
                 <div className="info">
-
-                  <p>
-                    JavaScript
-                  </p>
-
+                  <p>JavaScript</p>
                   <p>74%</p>
-
                 </div>
 
                 <div className="bar">
@@ -853,18 +924,11 @@ function AppContainer() {
               </div>
 
 
-              {/* REACT */}
-
               <div className="skill-bar">
 
                 <div className="info">
-
-                  <p>
-                    React.js
-                  </p>
-
+                  <p>React.js</p>
                   <p>99%</p>
-
                 </div>
 
                 <div className="bar">
@@ -874,18 +938,11 @@ function AppContainer() {
               </div>
 
 
-              {/* JAVA */}
-
               <div className="skill-bar">
 
                 <div className="info">
-
-                  <p>
-                    Java
-                  </p>
-
+                  <p>Java</p>
                   <p>85%</p>
-
                 </div>
 
                 <div className="bar">
@@ -895,18 +952,11 @@ function AppContainer() {
               </div>
 
 
-              {/* ORACLE */}
-
               <div className="skill-bar">
 
                 <div className="info">
-
-                  <p>
-                    Oracle / PL/SQL
-                  </p>
-
+                  <p>Oracle / PL/SQL</p>
                   <p>82%</p>
-
                 </div>
 
                 <div className="bar">
@@ -916,18 +966,11 @@ function AppContainer() {
               </div>
 
 
-              {/* NODE */}
-
               <div className="skill-bar">
 
                 <div className="info">
-
-                  <p>
-                    Node.js / Express.js
-                  </p>
-
+                  <p>Node.js / Express.js</p>
                   <p>70%</p>
-
                 </div>
 
                 <div className="bar">
@@ -937,18 +980,11 @@ function AppContainer() {
               </div>
 
 
-              {/* AI */}
-
               <div className="skill-bar">
 
                 <div className="info">
-
-                  <p>
-                    AI / ML
-                  </p>
-
+                  <p>AI / ML</p>
                   <p>87%</p>
-
                 </div>
 
                 <div className="bar">
@@ -971,9 +1007,6 @@ function AppContainer() {
 
               <div className="radial-bars">
 
-
-                {/* CREATIVITY */}
-
                 <div className="radial-bar">
 
                   <svg viewBox="0 0 200 200">
@@ -994,11 +1027,9 @@ function AppContainer() {
 
                   </svg>
 
-
                   <div className="Percentage">
                     90%
                   </div>
-
 
                   <div className="text">
                     Creativity
@@ -1006,8 +1037,6 @@ function AppContainer() {
 
                 </div>
 
-
-                {/* COMMUNICATION */}
 
                 <div className="radial-bar">
 
@@ -1029,11 +1058,9 @@ function AppContainer() {
 
                   </svg>
 
-
                   <div className="Percentage">
                     65%
                   </div>
-
 
                   <div className="text">
                     Communication
@@ -1046,9 +1073,6 @@ function AppContainer() {
 
               <div className="radial-bars">
 
-
-                {/* PROBLEM SOLVING */}
-
                 <div className="radial-bar">
 
                   <svg viewBox="0 0 200 200">
@@ -1069,11 +1093,9 @@ function AppContainer() {
 
                   </svg>
 
-
                   <div className="Percentage">
                     75%
                   </div>
-
 
                   <div className="text">
                     Problem Solving
@@ -1082,8 +1104,6 @@ function AppContainer() {
                 </div>
 
 
-                {/* TEAMWORK */}
-
                 <div className="radial-bar">
 
                   <svg viewBox="0 0 200 200">
@@ -1104,11 +1124,9 @@ function AppContainer() {
 
                   </svg>
 
-
                   <div className="Percentage">
                     85%
                   </div>
-
 
                   <div className="text">
                     Team Work
@@ -1185,7 +1203,9 @@ function AppContainer() {
               goToSection("home")
             }
           >
+
             <i className="bx bx-up-arrow-alt" />
+
           </button>
 
         </footer>
@@ -1201,9 +1221,10 @@ function AppContainer() {
 // ROOT
 // =====================================================
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root")
-);
+const root =
+  ReactDOM.createRoot(
+    document.getElementById("root")
+  );
 
 
 root.render(
@@ -1222,7 +1243,7 @@ root.render(
         />
 
 
-        {/* EDUCATION PAGE */}
+        {/* EDUCATION */}
 
         <Route
           path="/education"
