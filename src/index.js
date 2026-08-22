@@ -11,7 +11,6 @@ import Education from "./pages/Education";
 import Typewriter from "typewriter-effect";
 import "boxicons/css/boxicons.min.css";
 
-
 // =====================================================
 // MAIN APPLICATION
 // =====================================================
@@ -19,25 +18,9 @@ import "boxicons/css/boxicons.min.css";
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  /*
-    Current page/section is controlled by the normal
-    browser hash.
-
-    Examples:
-
-    #home
-    #about
-    #services
-    #skills
-    #portfolio
-    #contact
-    #education
-  */
-
   const [currentHash, setCurrentHash] = useState(
     window.location.hash
   );
-
 
   // =====================================================
   // HANDLE HASH CHANGE
@@ -48,19 +31,12 @@ function App() {
       setCurrentHash(window.location.hash);
     };
 
-    window.addEventListener(
-      "hashchange",
-      handleHashChange
-    );
+    window.addEventListener("hashchange", handleHashChange);
 
     return () => {
-      window.removeEventListener(
-        "hashchange",
-        handleHashChange
-      );
+      window.removeEventListener("hashchange", handleHashChange);
     };
   }, []);
-
 
   // =====================================================
   // GET CURRENT SECTION
@@ -76,7 +52,6 @@ function App() {
     return hash.replace("#", "");
   };
 
-
   // =====================================================
   // MOBILE MENU
   // =====================================================
@@ -85,11 +60,9 @@ function App() {
     setIsMenuOpen((previous) => !previous);
   };
 
-
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
-
 
   // =====================================================
   // GO TO SECTION
@@ -98,19 +71,8 @@ function App() {
   const goToSection = (sectionId) => {
     closeMenu();
 
-    /*
-      Change browser URL.
-
-      Example:
-
-      #services
-      #skills
-      #contact
-    */
-
     window.location.hash = sectionId;
   };
-
 
   // =====================================================
   // SCROLL TO CURRENT SECTION
@@ -119,23 +81,12 @@ function App() {
   useEffect(() => {
     const section = getCurrentSection();
 
-    /*
-      Education is a separate page.
-      Do not try to find it inside portfolio.
-    */
-
     if (section === "education") {
       return;
     }
 
-
-    /*
-      Wait until React has rendered the page.
-    */
-
     setTimeout(() => {
-      const element =
-        document.getElementById(section);
+      const element = document.getElementById(section);
 
       if (element) {
         element.scrollIntoView({
@@ -144,50 +95,31 @@ function App() {
         });
       }
     }, 100);
-
   }, [currentHash]);
-
 
   // =====================================================
   // ACTIVE MENU + STICKY HEADER
   // =====================================================
 
   useEffect(() => {
-    const header =
-      document.querySelector("header");
+    const header = document.querySelector("header");
 
-    const sections =
-      document.querySelectorAll(
-        "main section[id]"
-      );
+    const sections = document.querySelectorAll(
+      "main section[id]"
+    );
 
-    const links =
-      document.querySelectorAll(
-        "header .section-link"
-      );
-
+    const links = document.querySelectorAll(
+      "header .section-link"
+    );
 
     if (!sections.length) {
       return;
     }
 
-
     const updateMenu = () => {
       let currentSection = "home";
 
-
-      /*
-        If user clicked a navigation item,
-        use that hash as the active section.
-      */
-
-      const hash =
-        window.location.hash.replace("#", "");
-
-
-      /*
-        Only use portfolio sections here.
-      */
+      const hash = window.location.hash.replace("#", "");
 
       const portfolioSections = [
         "home",
@@ -198,33 +130,17 @@ function App() {
         "contact",
       ];
 
-
-      if (
-        portfolioSections.includes(hash)
-      ) {
+      if (portfolioSections.includes(hash)) {
         currentSection = hash;
       } else {
-
-        /*
-          Detect section from scroll position.
-        */
-
-        const scrollPosition =
-          window.scrollY + 250;
-
+        const scrollPosition = window.scrollY + 250;
 
         sections.forEach((section) => {
-          if (
-            scrollPosition >=
-            section.offsetTop
-          ) {
-            currentSection =
-              section.id;
+          if (scrollPosition >= section.offsetTop) {
+            currentSection = section.id;
           }
         });
-
       }
-
 
       // =================================================
       // ACTIVE NAVIGATION
@@ -233,34 +149,27 @@ function App() {
       links.forEach((link) => {
         link.classList.remove("active");
 
-
         if (
-          link.dataset.section ===
-          currentSection
+          link.dataset.section === currentSection
         ) {
           link.classList.add("active");
         }
       });
-
 
       // =================================================
       // STICKY HEADER
       // =================================================
 
       if (header) {
-
         if (window.scrollY > 50) {
           header.classList.add("sticky");
         } else {
           header.classList.remove("sticky");
         }
-
       }
     };
 
-
     updateMenu();
-
 
     window.addEventListener(
       "scroll",
@@ -268,12 +177,10 @@ function App() {
       { passive: true }
     );
 
-
     window.addEventListener(
       "hashchange",
       updateMenu
     );
-
 
     return () => {
       window.removeEventListener(
@@ -286,31 +193,18 @@ function App() {
         updateMenu
       );
     };
-
   }, [currentHash]);
-
 
   // =====================================================
   // EDUCATION PAGE
   // =====================================================
 
-  /*
-    If URL is:
-
-    https://fidakhanprog.github.io/FK/#education
-
-    show Education component.
-  */
-
   if (
     currentHash === "#education" ||
     currentHash === "education"
   ) {
-    return (
-      <Education />
-    );
+    return <Education />;
   }
-
 
   // =====================================================
   // PORTFOLIO
@@ -324,33 +218,24 @@ function App() {
 
       <header>
 
-        {/* =================================================
-            LOGO
-        ================================================= */}
+        {/* LOGO */}
 
         <button
           type="button"
           className="logo"
-          onClick={() =>
-            goToSection("home")
-          }
+          onClick={() => goToSection("home")}
         >
           <span>Fida</span> Khan.
         </button>
-
 
         {/* =================================================
             NAVIGATION
         ================================================= */}
 
         <ul
-          className={
-            `navList ${
-              isMenuOpen
-                ? "open"
-                : ""
-            }`
-          }
+          className={`navList ${
+            isMenuOpen ? "open" : ""
+          }`}
         >
 
           {/* HOME */}
@@ -360,14 +245,11 @@ function App() {
               type="button"
               className="section-link"
               data-section="home"
-              onClick={() =>
-                goToSection("home")
-              }
+              onClick={() => goToSection("home")}
             >
               Home
             </button>
           </li>
-
 
           {/* ABOUT */}
 
@@ -376,14 +258,11 @@ function App() {
               type="button"
               className="section-link"
               data-section="about"
-              onClick={() =>
-                goToSection("about")
-              }
+              onClick={() => goToSection("about")}
             >
               About
             </button>
           </li>
-
 
           {/* SERVICES */}
 
@@ -392,14 +271,11 @@ function App() {
               type="button"
               className="section-link"
               data-section="services"
-              onClick={() =>
-                goToSection("services")
-              }
+              onClick={() => goToSection("services")}
             >
               Services
             </button>
           </li>
-
 
           {/* SKILLS */}
 
@@ -408,14 +284,11 @@ function App() {
               type="button"
               className="section-link"
               data-section="skills"
-              onClick={() =>
-                goToSection("skills")
-              }
+              onClick={() => goToSection("skills")}
             >
               Skills
             </button>
           </li>
-
 
           {/* PORTFOLIO */}
 
@@ -424,14 +297,11 @@ function App() {
               type="button"
               className="section-link"
               data-section="portfolio"
-              onClick={() =>
-                goToSection("portfolio")
-              }
+              onClick={() => goToSection("portfolio")}
             >
               Portfolio
             </button>
           </li>
-
 
           {/* CONTACT */}
 
@@ -440,14 +310,11 @@ function App() {
               type="button"
               className="section-link"
               data-section="contact"
-              onClick={() =>
-                goToSection("contact")
-              }
+              onClick={() => goToSection("contact")}
             >
               Contact
             </button>
           </li>
-
 
           {/* EDUCATION */}
 
@@ -456,9 +323,7 @@ function App() {
               type="button"
               className="section-link"
               data-section="education"
-              onClick={() =>
-                goToSection("education")
-              }
+              onClick={() => goToSection("education")}
             >
               Education
             </button>
@@ -466,9 +331,8 @@ function App() {
 
         </ul>
 
-
         {/* =================================================
-            MOBILE MENU
+            MOBILE MENU BUTTON
         ================================================= */}
 
         <button
@@ -479,18 +343,16 @@ function App() {
               ? "Close menu"
               : "Open menu"
           }
-          className={
-            `bx ${
-              isMenuOpen
-                ? "bx-x"
-                : "bx-menu"
-            }`
-          }
+          aria-expanded={isMenuOpen}
+          className={`bx ${
+            isMenuOpen
+              ? "bx-x"
+              : "bx-menu"
+          }`}
           onClick={handleMenu}
         />
 
       </header>
-
 
       {/* =================================================
           MAIN
@@ -513,33 +375,31 @@ function App() {
               Hi I'm Fida Khan
             </h1>
 
-
             <div className="change-text">
 
               <h3>
                 And I'm
               </h3>
 
-
               <span className="auto-type">
-  <Typewriter
-    options={{
-      autoStart: true,
-      loop: true,
-      delay: 40,
-      strings: [
-        "Software Engineer",
-        ".Net Developer",
-        "Frontend Developer",
-        "Python Developer",
-        "AI Developer",
-        "SQL Developer",
-      ],
-    }}
-  />
-</span>
-            </div>
+                <Typewriter
+                  options={{
+                    autoStart: true,
+                    loop: true,
+                    delay: 40,
+                    strings: [
+                      "Software Engineer",
+                      ".Net Developer",
+                      "Frontend Developer",
+                      "Python Developer",
+                      "AI Developer",
+                      "SQL Developer",
+                    ],
+                  }}
+                />
+              </span>
 
+            </div>
 
             <p>
               I am a passionate .NET Developer and
@@ -557,11 +417,6 @@ function App() {
               high-quality results.
             </p>
 
-
-            {/* =================================================
-                BUTTONS
-            ================================================= */}
-
             <div className="btn-box">
 
               <a
@@ -572,7 +427,6 @@ function App() {
                 Download CV
               </a>
 
-
               <a
                 href="mailto:engrfidabettani@gmail.com"
                 className="btn"
@@ -582,14 +436,7 @@ function App() {
 
             </div>
 
-
-            {/* =================================================
-                SOCIAL ICONS
-            ================================================= */}
-
             <div className="social-icons">
-
-              {/* EMAIL */}
 
               <a
                 href="mailto:engrfidabettani@gmail.com"
@@ -597,9 +444,6 @@ function App() {
               >
                 <i className="bx bxs-envelope" />
               </a>
-
-
-              {/* LINKEDIN */}
 
               <a
                 href="https://www.linkedin.com/in/fida-khan-767110240/"
@@ -610,9 +454,6 @@ function App() {
                 <i className="bx bxl-linkedin" />
               </a>
 
-
-              {/* GITHUB */}
-
               <a
                 href="https://github.com/fidakhanProg"
                 target="_blank"
@@ -622,9 +463,6 @@ function App() {
                 <i className="bx bxl-github" />
               </a>
 
-
-              {/* FACEBOOK */}
-
               <a
                 href="https://www.facebook.com/profile.php?id=100026060852750"
                 target="_blank"
@@ -633,9 +471,6 @@ function App() {
               >
                 <i className="bx bxl-facebook" />
               </a>
-
-
-              {/* TIKTOK */}
 
               <a
                 href="https://www.tiktok.com/@thefkcircle"
@@ -649,11 +484,6 @@ function App() {
             </div>
 
           </div>
-
-
-          {/* =================================================
-              HOME IMAGE
-          ================================================= */}
 
           <div className="home-image">
 
@@ -670,7 +500,6 @@ function App() {
           </div>
 
         </section>
-
 
         {/* =================================================
             ABOUT
@@ -691,7 +520,6 @@ function App() {
 
           </div>
 
-
           <div className="about-content">
 
             <h2>
@@ -702,9 +530,7 @@ function App() {
               A story of good
             </h3>
 
-
             <p>
-
               My name is Fida Khan, and I am a
               passionate Software Engineer and
               Full-Stack Developer focused on
@@ -762,13 +588,11 @@ function App() {
               and modern technologies to create
               reliable applications that deliver
               real value.
-
             </p>
 
           </div>
 
         </section>
-
 
         {/* =================================================
             SERVICES
@@ -791,10 +615,7 @@ function App() {
 
           </div>
 
-
           <div className="section_services">
-
-            {/* DOT NET */}
 
             <div className="service-box">
 
@@ -815,9 +636,6 @@ function App() {
 
             </div>
 
-
-            {/* RESPONSIVE WEB DESIGN */}
-
             <div className="service-box">
 
               <i className="bx bx-desktop service-icon" />
@@ -835,9 +653,6 @@ function App() {
               </p>
 
             </div>
-
-
-            {/* REACT */}
 
             <div className="service-box">
 
@@ -861,7 +676,6 @@ function App() {
 
         </section>
 
-
         {/* =================================================
             SKILLS
         ================================================= */}
@@ -883,10 +697,7 @@ function App() {
 
           </div>
 
-
           <div className="skill-main">
-
-            {/* TECHNICAL SKILLS */}
 
             <div className="skill-left">
 
@@ -894,13 +705,11 @@ function App() {
                 Technical Skills
               </h3>
 
-
               <Skill
                 name="Dot Net C#"
                 percent="99%"
                 className="html"
               />
-
 
               <Skill
                 name="Microsoft SQL Server"
@@ -908,13 +717,11 @@ function App() {
                 className="css"
               />
 
-
               <Skill
                 name="Python"
                 percent="87%"
                 className="bootstrap"
               />
-
 
               <Skill
                 name="HTML/CSS/Bootstrap/Tailwind"
@@ -922,13 +729,11 @@ function App() {
                 className="tailwind"
               />
 
-
               <Skill
                 name="JavaScript"
                 percent="74%"
                 className="javascript"
               />
-
 
               <Skill
                 name="React.js"
@@ -936,13 +741,11 @@ function App() {
                 className="bootstrap"
               />
 
-
               <Skill
                 name="Java"
                 percent="85%"
                 className="bootstrap"
               />
-
 
               <Skill
                 name="Oracle / PL/SQL"
@@ -950,13 +753,11 @@ function App() {
                 className="bootstrap"
               />
 
-
               <Skill
                 name="Node.js / Express.js"
                 percent="70%"
                 className="bootstrap"
               />
-
 
               <Skill
                 name="AI / ML"
@@ -966,15 +767,11 @@ function App() {
 
             </div>
 
-
-            {/* PROFESSIONAL SKILLS */}
-
             <div className="skill-right">
 
               <h3>
                 Professional Skills
               </h3>
-
 
               <div className="radial-bars">
 
@@ -984,7 +781,6 @@ function App() {
                   path="path-1"
                 />
 
-
                 <RadialSkill
                   percentage="65%"
                   label="Communication"
@@ -993,7 +789,6 @@ function App() {
 
               </div>
 
-
               <div className="radial-bars">
 
                 <RadialSkill
@@ -1001,7 +796,6 @@ function App() {
                   label="Problem Solving"
                   path="path-3"
                 />
-
 
                 <RadialSkill
                   percentage="85%"
@@ -1017,7 +811,6 @@ function App() {
 
         </section>
 
-
         {/* =================================================
             PORTFOLIO
         ================================================= */}
@@ -1026,11 +819,8 @@ function App() {
           id="portfolio"
           className="portfolio"
         >
-
           <PortfolioSection />
-
         </section>
-
 
         {/* =================================================
             CONTACT
@@ -1053,11 +843,9 @@ function App() {
 
           </div>
 
-
           <ContactForm />
 
         </section>
-
 
         {/* =================================================
             FOOTER
@@ -1070,17 +858,12 @@ function App() {
             Developer || All Rights Reserved.
           </p>
 
-
           <button
             type="button"
             title="Go to Home"
-            onClick={() =>
-              goToSection("home")
-            }
+            onClick={() => goToSection("home")}
           >
-
             <i className="bx bx-up-arrow-alt" />
-
           </button>
 
         </footer>
@@ -1089,7 +872,6 @@ function App() {
     </>
   );
 }
-
 
 // =====================================================
 // SKILL COMPONENT
@@ -1115,19 +897,15 @@ function Skill({
 
       </div>
 
-
       <div className="bar">
 
-        <span
-          className={className}
-        />
+        <span className={className} />
 
       </div>
 
     </div>
   );
 }
-
 
 // =====================================================
 // RADIAL SKILL COMPONENT
@@ -1150,7 +928,6 @@ function RadialSkill({
           r="80"
         />
 
-
         <circle
           className={`path ${path}`}
           cx="100"
@@ -1160,11 +937,9 @@ function RadialSkill({
 
       </svg>
 
-
       <div className="Percentage">
         {percentage}
       </div>
-
 
       <div className="text">
         {label}
@@ -1174,22 +949,18 @@ function RadialSkill({
   );
 }
 
-
 // =====================================================
 // ROOT
 // =====================================================
 
-const root =
-  ReactDOM.createRoot(
-    document.getElementById("root")
-  );
-
+const root = ReactDOM.createRoot(
+  document.getElementById("root")
+);
 
 root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
 );
-
 
 reportWebVitals();
