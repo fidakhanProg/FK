@@ -186,6 +186,7 @@ section {
   font-size: 1.5rem;
   font-weight: 600;
   display: inline-flex;
+  align-items: center;
 }
 
 .change-text h3 {
@@ -193,17 +194,14 @@ section {
   margin-right: 10px;
 }
 
-.change-text span .auto-type {
-  content: "";
-  position: absolute;
+.auto-type {
+  color: var(--hover-color);
   font-size: 1.5rem;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  animation: animate 4s steps(12) infinite;
+  font-weight: 700;
+  text-shadow:
+    0 0 10px rgba(248, 252, 40, 0.6),
+    0 0 20px rgba(248, 252, 40, 0.5);
 }
-
 .change-text .auto-type {
   margin-top: 3px;
 }
