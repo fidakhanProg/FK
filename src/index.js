@@ -522,25 +522,22 @@ function App() {
 
 
               <span className="auto-type">
-
-                <Typewriter
-                  options={{
-                    autoStart: true,
-                    loop: true,
-                    delay: 40,
-                    strings: [
-                      "Software Engineer",
-                      ".Net Developer",
-                      "Frontend Developer",
-                      "Python Developer",
-                      "AI Developer",
-                      "SQL Developer",
-                    ],
-                  }}
-                />
-
-              </span>
-
+  <Typewriter
+    options={{
+      autoStart: true,
+      loop: true,
+      delay: 40,
+      strings: [
+        "Software Engineer",
+        ".Net Developer",
+        "Frontend Developer",
+        "Python Developer",
+        "AI Developer",
+        "SQL Developer",
+      ],
+    }}
+  />
+</span>
             </div>
 
 
