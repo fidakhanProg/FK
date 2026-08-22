@@ -17,6 +17,7 @@ import {
   Route,
   Link,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
 
@@ -25,11 +26,10 @@ import {
 // =====================================================
 
 function AppContainer() {
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const location = useLocation();
-
+  const navigate = useNavigate();
 
   // =====================================================
   // MOBILE MENU
@@ -39,28 +39,25 @@ function AppContainer() {
     setIsMenuOpen((previous) => !previous);
   };
 
-
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
-
 
   // =====================================================
   // SCROLL TO SECTION
   // =====================================================
 
   const goToSection = (sectionId) => {
-
     closeMenu();
 
-    // Make absolutely sure we are on the portfolio
+    // If currently on Education or another route,
+    // first return to the main portfolio page.
     if (location.pathname !== "/") {
-      window.location.href =
-        `${window.location.origin}${window.location.pathname}#/`;
+      navigate("/");
 
+      // Wait for the portfolio to render
       setTimeout(() => {
-        const element =
-          document.getElementById(sectionId);
+        const element = document.getElementById(sectionId);
 
         if (element) {
           element.scrollIntoView({
@@ -68,127 +65,82 @@ function AppContainer() {
             block: "start",
           });
         }
-      }, 500);
+      }, 150);
 
       return;
     }
 
-
-    const element =
-      document.getElementById(sectionId);
-
+    // Already on portfolio page
+    const element = document.getElementById(sectionId);
 
     if (!element) {
-      console.error(
-        "Section not found:",
-        sectionId
-      );
+      console.error("Section not found:", sectionId);
       return;
     }
-
 
     element.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
-
   };
-
 
   // =====================================================
   // ACTIVE MENU + STICKY HEADER
   // =====================================================
 
   useEffect(() => {
-
+    // Only run portfolio section logic on the main page
     if (location.pathname !== "/") {
       return;
     }
 
+    const header = document.querySelector("header");
 
-    const header =
-      document.querySelector("header");
+    const sections = document.querySelectorAll(
+      "main section[id]"
+    );
 
-
-    const sections =
-      document.querySelectorAll(
-        "main section[id]"
-      );
-
-
-    const links =
-      document.querySelectorAll(
-        "header .section-link"
-      );
-
+    const links = document.querySelectorAll(
+      "header .section-link"
+    );
 
     if (!sections.length) {
       return;
     }
 
-
     const updateMenu = () => {
-
       let currentSection = "home";
 
-
-      const scrollPosition =
-        window.scrollY + 250;
-
+      const scrollPosition = window.scrollY + 250;
 
       sections.forEach((section) => {
-
-        if (
-          scrollPosition >=
-          section.offsetTop
-        ) {
-
-          currentSection =
-            section.id;
-
+        if (scrollPosition >= section.offsetTop) {
+          currentSection = section.id;
         }
-
       });
 
-
+      // Update active navigation item
       links.forEach((link) => {
-
         link.classList.remove("active");
 
-
         if (
-          link.dataset.section ===
-          currentSection
+          link.dataset.section === currentSection
         ) {
-
           link.classList.add("active");
-
         }
-
       });
 
-
       // Sticky header
-
       if (header) {
-
         if (window.scrollY > 50) {
-
           header.classList.add("sticky");
-
         } else {
-
           header.classList.remove("sticky");
-
         }
-
       }
-
     };
 
-
     updateMenu();
-
 
     window.addEventListener(
       "scroll",
@@ -196,18 +148,13 @@ function AppContainer() {
       { passive: true }
     );
 
-
     return () => {
-
       window.removeEventListener(
         "scroll",
         updateMenu
       );
-
     };
-
   }, [location.pathname]);
-
 
   // =====================================================
   // RETURN
@@ -215,30 +162,20 @@ function AppContainer() {
 
   return (
     <>
-
       {/* =================================================
           HEADER
       ================================================= */}
 
       <header>
 
-
         {/* LOGO */}
 
         <button
           type="button"
           className="logo"
-          onClick={() =>
-            goToSection("home")
-          }
+          onClick={() => goToSection("home")}
         >
-
-          <span>
-            Fida
-          </span>
-
-          Khan.
-
+          <span>Fida</span> Khan.
         </button>
 
 
@@ -247,92 +184,70 @@ function AppContainer() {
         ================================================= */}
 
         <ul
-          className={
-            `navList ${
-              isMenuOpen
-                ? "open"
-                : ""
-            }`
-          }
+          className={`navList ${
+            isMenuOpen ? "open" : ""
+          }`}
         >
-
 
           {/* HOME */}
 
           <li>
-
             <button
               type="button"
               className="section-link"
               data-section="home"
-              onClick={() =>
-                goToSection("home")
-              }
+              onClick={() => goToSection("home")}
             >
               Home
             </button>
-
           </li>
 
 
           {/* ABOUT */}
 
           <li>
-
             <button
               type="button"
               className="section-link"
               data-section="about"
-              onClick={() =>
-                goToSection("about")
-              }
+              onClick={() => goToSection("about")}
             >
               About
             </button>
-
           </li>
 
 
           {/* SERVICES */}
 
           <li>
-
             <button
               type="button"
               className="section-link"
               data-section="services"
-              onClick={() =>
-                goToSection("services")
-              }
+              onClick={() => goToSection("services")}
             >
               Services
             </button>
-
           </li>
 
 
           {/* SKILLS */}
 
           <li>
-
             <button
               type="button"
               className="section-link"
               data-section="skills"
-              onClick={() =>
-                goToSection("skills")
-              }
+              onClick={() => goToSection("skills")}
             >
               Skills
             </button>
-
           </li>
 
 
           {/* PORTFOLIO */}
 
           <li>
-
             <button
               type="button"
               className="section-link"
@@ -343,39 +258,32 @@ function AppContainer() {
             >
               Portfolio
             </button>
-
           </li>
 
 
           {/* CONTACT */}
 
           <li>
-
             <button
               type="button"
               className="section-link"
               data-section="contact"
-              onClick={() =>
-                goToSection("contact")
-              }
+              onClick={() => goToSection("contact")}
             >
               Contact
             </button>
-
           </li>
 
 
           {/* EDUCATION */}
 
           <li>
-
             <Link
               to="/education"
               onClick={closeMenu}
             >
               Education
             </Link>
-
           </li>
 
         </ul>
@@ -393,13 +301,11 @@ function AppContainer() {
               ? "Close menu"
               : "Open menu"
           }
-          className={
-            `bx ${
-              isMenuOpen
-                ? "bx-x"
-                : "bx-menu"
-            }`
-          }
+          className={`bx ${
+            isMenuOpen
+              ? "bx-x"
+              : "bx-menu"
+          }`}
           onClick={handleMenu}
         />
 
@@ -411,7 +317,6 @@ function AppContainer() {
       ================================================= */}
 
       <main>
-
 
         {/* =================================================
             HOME
@@ -478,9 +383,7 @@ function AppContainer() {
             <div className="btn-box">
 
               <a
-                href={
-                  `${process.env.PUBLIC_URL}/Fidai.pdf`
-                }
+                href={`${process.env.PUBLIC_URL}/Fidai.pdf`}
                 download="Fida Khan CV.pdf"
                 className="btn"
               >
@@ -502,6 +405,8 @@ function AppContainer() {
 
             <div className="social-icons">
 
+              {/* Email */}
+
               <a
                 href="mailto:engrfidabettani@gmail.com"
                 title="Email"
@@ -509,6 +414,8 @@ function AppContainer() {
                 <i className="bx bxs-envelope" />
               </a>
 
+
+              {/* LinkedIn */}
 
               <a
                 href="https://www.linkedin.com/in/fida-khan-767110240/"
@@ -520,6 +427,8 @@ function AppContainer() {
               </a>
 
 
+              {/* GitHub */}
+
               <a
                 href="https://github.com/fidakhanProg"
                 target="_blank"
@@ -530,6 +439,8 @@ function AppContainer() {
               </a>
 
 
+              {/* Facebook */}
+
               <a
                 href="https://www.facebook.com/profile.php?id=100026060852750"
                 target="_blank"
@@ -539,6 +450,8 @@ function AppContainer() {
                 <i className="bx bxl-facebook" />
               </a>
 
+
+              {/* TikTok */}
 
               <a
                 href="https://www.tiktok.com/@thefkcircle"
@@ -561,9 +474,7 @@ function AppContainer() {
             <div className="img-box">
 
               <img
-                src={
-                  `${process.env.PUBLIC_URL}/img/4.png`
-                }
+                src={`${process.env.PUBLIC_URL}/img/4.png`}
                 alt="Fida Khan"
                 className="profile-img"
               />
@@ -587,9 +498,7 @@ function AppContainer() {
           <div className="img-box">
 
             <img
-              src={
-                `${process.env.PUBLIC_URL}/img/4.png`
-              }
+              src={`${process.env.PUBLIC_URL}/img/4.png`}
               alt="Fida Khan"
               className="profile-img"
             />
@@ -698,6 +607,7 @@ function AppContainer() {
 
           <div className="section_services">
 
+            {/* DOT NET */}
 
             <div className="service-box">
 
@@ -719,6 +629,8 @@ function AppContainer() {
             </div>
 
 
+            {/* RESPONSIVE WEB DESIGN */}
+
             <div className="service-box">
 
               <i className="bx bx-desktop service-icon" />
@@ -737,6 +649,8 @@ function AppContainer() {
 
             </div>
 
+
+            {/* REACT */}
 
             <div className="service-box">
 
@@ -785,6 +699,7 @@ function AppContainer() {
 
           <div className="skill-main">
 
+            {/* TECHNICAL SKILLS */}
 
             <div className="skill-left">
 
@@ -799,11 +714,13 @@ function AppContainer() {
                 className="html"
               />
 
+
               <Skill
                 name="Microsoft SQL Server"
                 percent="100%"
                 className="css"
               />
+
 
               <Skill
                 name="Python"
@@ -811,11 +728,13 @@ function AppContainer() {
                 className="bootstrap"
               />
 
+
               <Skill
                 name="HTML/CSS/Bootstrap/Tailwind"
                 percent="100%"
                 className="tailwind"
               />
+
 
               <Skill
                 name="JavaScript"
@@ -823,11 +742,13 @@ function AppContainer() {
                 className="javascript"
               />
 
+
               <Skill
                 name="React.js"
                 percent="99%"
                 className="bootstrap"
               />
+
 
               <Skill
                 name="Java"
@@ -835,17 +756,20 @@ function AppContainer() {
                 className="bootstrap"
               />
 
+
               <Skill
                 name="Oracle / PL/SQL"
                 percent="82%"
                 className="bootstrap"
               />
 
+
               <Skill
                 name="Node.js / Express.js"
                 percent="70%"
                 className="bootstrap"
               />
+
 
               <Skill
                 name="AI / ML"
@@ -855,6 +779,8 @@ function AppContainer() {
 
             </div>
 
+
+            {/* PROFESSIONAL SKILLS */}
 
             <div className="skill-right">
 
@@ -870,6 +796,7 @@ function AppContainer() {
                   label="Creativity"
                   path="path-1"
                 />
+
 
                 <RadialSkill
                   percentage="65%"
@@ -887,6 +814,7 @@ function AppContainer() {
                   label="Problem Solving"
                   path="path-3"
                 />
+
 
                 <RadialSkill
                   percentage="85%"
@@ -959,9 +887,7 @@ function AppContainer() {
           <button
             type="button"
             title="Go to Home"
-            onClick={() =>
-              goToSection("home")
-            }
+            onClick={() => goToSection("home")}
           >
 
             <i className="bx bx-up-arrow-alt" />
@@ -971,14 +897,13 @@ function AppContainer() {
         </footer>
 
       </main>
-
     </>
   );
 }
 
 
 // =====================================================
-// SKILL
+// SKILL COMPONENT
 // =====================================================
 
 function Skill({
@@ -986,9 +911,7 @@ function Skill({
   percent,
   className,
 }) {
-
   return (
-
     <div className="skill-bar">
 
       <div className="info">
@@ -1013,13 +936,12 @@ function Skill({
       </div>
 
     </div>
-
   );
 }
 
 
 // =====================================================
-// RADIAL SKILL
+// RADIAL SKILL COMPONENT
 // =====================================================
 
 function RadialSkill({
@@ -1027,9 +949,7 @@ function RadialSkill({
   label,
   path,
 }) {
-
   return (
-
     <div className="radial-bar">
 
       <svg viewBox="0 0 200 200">
@@ -1061,7 +981,6 @@ function RadialSkill({
       </div>
 
     </div>
-
   );
 }
 
@@ -1070,21 +989,21 @@ function RadialSkill({
 // ROOT
 // =====================================================
 
-const root =
-  ReactDOM.createRoot(
-    document.getElementById("root")
-  );
+const root = ReactDOM.createRoot(
+  document.getElementById("root")
+);
 
 
 root.render(
-
   <React.StrictMode>
 
     <HashRouter>
 
       <Routes>
 
-        {/* PORTFOLIO */}
+        {/* =================================================
+            MAIN PORTFOLIO
+        ================================================= */}
 
         <Route
           path="/"
@@ -1092,7 +1011,9 @@ root.render(
         />
 
 
-        {/* EDUCATION ONLY */}
+        {/* =================================================
+            EDUCATION PAGE
+        ================================================= */}
 
         <Route
           path="/education"
@@ -1100,7 +1021,9 @@ root.render(
         />
 
 
-        {/* UNKNOWN ROUTES */}
+        {/* =================================================
+            UNKNOWN ROUTES
+        ================================================= */}
 
         <Route
           path="*"
@@ -1112,7 +1035,6 @@ root.render(
     </HashRouter>
 
   </React.StrictMode>
-
 );
 
 
