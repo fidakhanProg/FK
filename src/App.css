@@ -1599,3 +1599,152 @@ Footer a i {
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   MOBILE NAVBAR
+   ONLY NAVBAR CHANGES
+===================================================== */
+
+@media (max-width: 768px) {
+
+  header {
+    padding: 12px 5%;
+  }
+
+  /* SHOW THREE-LINE BUTTON */
+
+  #menu-icon {
+    display: flex;
+  }
+
+  /* HIDE NAVIGATION */
+
+  .navList {
+    position: absolute;
+
+    top: 100%;
+    left: 0;
+
+    width: 100%;
+
+    display: none;
+
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 0;
+
+    margin: 0;
+    padding: 10px 5% 15px;
+
+    background: var(--bg-color);
+
+    border-top: 1px solid var(--secon-bg-color);
+    border-bottom: 1px solid var(--secon-bg-color);
+
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.35);
+  }
+
+  /* SHOW MENU WHEN THREE-LINE BUTTON IS CLICKED */
+
+  .navList.open {
+    display: flex;
+  }
+
+  /* MOBILE MENU ITEMS */
+
+  .navList li {
+    width: 100%;
+  }
+
+  .navList .section-link {
+    width: 100%;
+
+    display: block;
+
+    text-align: left;
+
+    padding: 14px 15px;
+
+    font-size: 1rem;
+
+    color: var(--text-color);
+
+    border-radius: 5px;
+  }
+
+  /* MOBILE HOVER */
+
+  .navList .section-link:hover {
+    color: var(--hover-color);
+
+    background: rgba(18, 247, 255, 0.05);
+
+    text-shadow:
+      0 0 10px rgba(18, 247, 255, 0.5);
+  }
+
+  /* MOBILE ACTIVE */
+
+  .navList .section-link.active {
+    color: var(--hover-color);
+
+    background: rgba(18, 247, 255, 0.05);
+
+    text-shadow:
+      0 0 10px rgba(18, 247, 255, 0.6);
+  }
+
+  /* LOGO */
+
+  .logo {
+    font-size: 23px;
+  }
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 480px) {
+
+  header {
+    padding: 11px 4%;
+  }
+
+  .logo {
+    font-size: 21px;
+  }
+
+  #menu-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.8rem;
+  }
+
+  .navList {
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+
+  .navList .section-link {
+    padding: 13px 12px;
+    font-size: 0.95rem;
+  }
+}
