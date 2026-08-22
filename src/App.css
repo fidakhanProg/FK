@@ -141,19 +141,35 @@ header {
 
 /* MOBILE MENU ICON */
 #menu-icon {
-  font-size: 1.8rem;
+  font-size: 2rem;
+
   z-index: 10001;
+
   cursor: pointer;
 
-  margin-left: 25px;
+  margin-left: 20px;
 
   background: var(--hover-color);
   color: var(--secon-bg-color);
 
   border: none;
-  border-radius: 3px;
+  border-radius: 5px;
+
+  width: 42px;
+  height: 42px;
 
   display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  transition: 0.3s ease;
+}
+
+#menu-icon:hover {
+  transform: scale(1.05);
 }
 
 /* Home Section */
