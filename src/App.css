@@ -198,9 +198,7 @@ section {
   color: var(--hover-color);
   font-size: 1.5rem;
   font-weight: 700;
-  text-shadow:
-    0 0 10px rgba(248, 252, 40, 0.6),
-    0 0 20px rgba(248, 252, 40, 0.5);
+  
 }
 .change-text .auto-type {
   margin-top: 3px;
