@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
-import "./App.css";
+import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 
 import PortfolioSection from "./sections/portfolio";
@@ -11,25 +11,71 @@ import Education from "./pages/Education";
 import Typewriter from "typewriter-effect";
 import "boxicons/css/boxicons.min.css";
 
-import {
-  HashRouter,
-  Routes,
-  Route,
-  Link,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
-
 
 // =====================================================
-// MAIN PORTFOLIO
+// MAIN APPLICATION
 // =====================================================
 
-function AppContainer() {
+function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const location = useLocation();
-  const navigate = useNavigate();
+  /*
+    Current page/section is controlled by the normal
+    browser hash.
+
+    Examples:
+
+    #home
+    #about
+    #services
+    #skills
+    #portfolio
+    #contact
+    #education
+  */
+
+  const [currentHash, setCurrentHash] = useState(
+    window.location.hash
+  );
+
+
+  // =====================================================
+  // HANDLE HASH CHANGE
+  // =====================================================
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentHash(window.location.hash);
+    };
+
+    window.addEventListener(
+      "hashchange",
+      handleHashChange
+    );
+
+    return () => {
+      window.removeEventListener(
+        "hashchange",
+        handleHashChange
+      );
+    };
+  }, []);
+
+
+  // =====================================================
+  // GET CURRENT SECTION
+  // =====================================================
+
+  const getCurrentSection = () => {
+    const hash = window.location.hash;
+
+    if (!hash) {
+      return "home";
+    }
+
+    return hash.replace("#", "");
+  };
+
 
   // =====================================================
   // MOBILE MENU
@@ -39,108 +85,182 @@ function AppContainer() {
     setIsMenuOpen((previous) => !previous);
   };
 
+
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
 
+
   // =====================================================
-  // SCROLL TO SECTION
+  // GO TO SECTION
   // =====================================================
 
   const goToSection = (sectionId) => {
     closeMenu();
 
-    // If currently on Education or another route,
-    // first return to the main portfolio page.
-    if (location.pathname !== "/") {
-      navigate("/");
+    /*
+      Change browser URL.
 
-      // Wait for the portfolio to render
-      setTimeout(() => {
-        const element = document.getElementById(sectionId);
+      Example:
 
-        if (element) {
-          element.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      }, 150);
+      #services
+      #skills
+      #contact
+    */
 
-      return;
-    }
-
-    // Already on portfolio page
-    const element = document.getElementById(sectionId);
-
-    if (!element) {
-      console.error("Section not found:", sectionId);
-      return;
-    }
-
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    window.location.hash = sectionId;
   };
+
+
+  // =====================================================
+  // SCROLL TO CURRENT SECTION
+  // =====================================================
+
+  useEffect(() => {
+    const section = getCurrentSection();
+
+    /*
+      Education is a separate page.
+      Do not try to find it inside portfolio.
+    */
+
+    if (section === "education") {
+      return;
+    }
+
+
+    /*
+      Wait until React has rendered the page.
+    */
+
+    setTimeout(() => {
+      const element =
+        document.getElementById(section);
+
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
+
+  }, [currentHash]);
+
 
   // =====================================================
   // ACTIVE MENU + STICKY HEADER
   // =====================================================
 
   useEffect(() => {
-    // Only run portfolio section logic on the main page
-    if (location.pathname !== "/") {
-      return;
-    }
+    const header =
+      document.querySelector("header");
 
-    const header = document.querySelector("header");
+    const sections =
+      document.querySelectorAll(
+        "main section[id]"
+      );
 
-    const sections = document.querySelectorAll(
-      "main section[id]"
-    );
+    const links =
+      document.querySelectorAll(
+        "header .section-link"
+      );
 
-    const links = document.querySelectorAll(
-      "header .section-link"
-    );
 
     if (!sections.length) {
       return;
     }
 
+
     const updateMenu = () => {
       let currentSection = "home";
 
-      const scrollPosition = window.scrollY + 250;
 
-      sections.forEach((section) => {
-        if (scrollPosition >= section.offsetTop) {
-          currentSection = section.id;
-        }
-      });
+      /*
+        If user clicked a navigation item,
+        use that hash as the active section.
+      */
 
-      // Update active navigation item
+      const hash =
+        window.location.hash.replace("#", "");
+
+
+      /*
+        Only use portfolio sections here.
+      */
+
+      const portfolioSections = [
+        "home",
+        "about",
+        "services",
+        "skills",
+        "portfolio",
+        "contact",
+      ];
+
+
+      if (
+        portfolioSections.includes(hash)
+      ) {
+        currentSection = hash;
+      } else {
+
+        /*
+          Detect section from scroll position.
+        */
+
+        const scrollPosition =
+          window.scrollY + 250;
+
+
+        sections.forEach((section) => {
+          if (
+            scrollPosition >=
+            section.offsetTop
+          ) {
+            currentSection =
+              section.id;
+          }
+        });
+
+      }
+
+
+      // =================================================
+      // ACTIVE NAVIGATION
+      // =================================================
+
       links.forEach((link) => {
         link.classList.remove("active");
 
+
         if (
-          link.dataset.section === currentSection
+          link.dataset.section ===
+          currentSection
         ) {
           link.classList.add("active");
         }
       });
 
-      // Sticky header
+
+      // =================================================
+      // STICKY HEADER
+      // =================================================
+
       if (header) {
+
         if (window.scrollY > 50) {
           header.classList.add("sticky");
         } else {
           header.classList.remove("sticky");
         }
+
       }
     };
 
+
     updateMenu();
+
 
     window.addEventListener(
       "scroll",
@@ -148,16 +268,52 @@ function AppContainer() {
       { passive: true }
     );
 
+
+    window.addEventListener(
+      "hashchange",
+      updateMenu
+    );
+
+
     return () => {
       window.removeEventListener(
         "scroll",
         updateMenu
       );
+
+      window.removeEventListener(
+        "hashchange",
+        updateMenu
+      );
     };
-  }, [location.pathname]);
+
+  }, [currentHash]);
+
 
   // =====================================================
-  // RETURN
+  // EDUCATION PAGE
+  // =====================================================
+
+  /*
+    If URL is:
+
+    https://fidakhanprog.github.io/FK/#education
+
+    show Education component.
+  */
+
+  if (
+    currentHash === "#education" ||
+    currentHash === "education"
+  ) {
+    return (
+      <Education />
+    );
+  }
+
+
+  // =====================================================
+  // PORTFOLIO
   // =====================================================
 
   return (
@@ -168,12 +324,16 @@ function AppContainer() {
 
       <header>
 
-        {/* LOGO */}
+        {/* =================================================
+            LOGO
+        ================================================= */}
 
         <button
           type="button"
           className="logo"
-          onClick={() => goToSection("home")}
+          onClick={() =>
+            goToSection("home")
+          }
         >
           <span>Fida</span> Khan.
         </button>
@@ -184,9 +344,13 @@ function AppContainer() {
         ================================================= */}
 
         <ul
-          className={`navList ${
-            isMenuOpen ? "open" : ""
-          }`}
+          className={
+            `navList ${
+              isMenuOpen
+                ? "open"
+                : ""
+            }`
+          }
         >
 
           {/* HOME */}
@@ -196,7 +360,9 @@ function AppContainer() {
               type="button"
               className="section-link"
               data-section="home"
-              onClick={() => goToSection("home")}
+              onClick={() =>
+                goToSection("home")
+              }
             >
               Home
             </button>
@@ -210,7 +376,9 @@ function AppContainer() {
               type="button"
               className="section-link"
               data-section="about"
-              onClick={() => goToSection("about")}
+              onClick={() =>
+                goToSection("about")
+              }
             >
               About
             </button>
@@ -224,7 +392,9 @@ function AppContainer() {
               type="button"
               className="section-link"
               data-section="services"
-              onClick={() => goToSection("services")}
+              onClick={() =>
+                goToSection("services")
+              }
             >
               Services
             </button>
@@ -238,7 +408,9 @@ function AppContainer() {
               type="button"
               className="section-link"
               data-section="skills"
-              onClick={() => goToSection("skills")}
+              onClick={() =>
+                goToSection("skills")
+              }
             >
               Skills
             </button>
@@ -268,7 +440,9 @@ function AppContainer() {
               type="button"
               className="section-link"
               data-section="contact"
-              onClick={() => goToSection("contact")}
+              onClick={() =>
+                goToSection("contact")
+              }
             >
               Contact
             </button>
@@ -278,12 +452,16 @@ function AppContainer() {
           {/* EDUCATION */}
 
           <li>
-            <Link
-              to="/education"
-              onClick={closeMenu}
+            <button
+              type="button"
+              className="section-link"
+              data-section="education"
+              onClick={() =>
+                goToSection("education")
+              }
             >
               Education
-            </Link>
+            </button>
           </li>
 
         </ul>
@@ -301,11 +479,13 @@ function AppContainer() {
               ? "Close menu"
               : "Open menu"
           }
-          className={`bx ${
-            isMenuOpen
-              ? "bx-x"
-              : "bx-menu"
-          }`}
+          className={
+            `bx ${
+              isMenuOpen
+                ? "bx-x"
+                : "bx-menu"
+            }`
+          }
           onClick={handleMenu}
         />
 
@@ -339,6 +519,7 @@ function AppContainer() {
               <h3>
                 And I'm
               </h3>
+
 
               <span className="auto-type">
 
@@ -380,6 +561,10 @@ function AppContainer() {
             </p>
 
 
+            {/* =================================================
+                BUTTONS
+            ================================================= */}
+
             <div className="btn-box">
 
               <a
@@ -401,11 +586,13 @@ function AppContainer() {
             </div>
 
 
-            {/* SOCIAL */}
+            {/* =================================================
+                SOCIAL ICONS
+            ================================================= */}
 
             <div className="social-icons">
 
-              {/* Email */}
+              {/* EMAIL */}
 
               <a
                 href="mailto:engrfidabettani@gmail.com"
@@ -415,7 +602,7 @@ function AppContainer() {
               </a>
 
 
-              {/* LinkedIn */}
+              {/* LINKEDIN */}
 
               <a
                 href="https://www.linkedin.com/in/fida-khan-767110240/"
@@ -427,7 +614,7 @@ function AppContainer() {
               </a>
 
 
-              {/* GitHub */}
+              {/* GITHUB */}
 
               <a
                 href="https://github.com/fidakhanProg"
@@ -439,7 +626,7 @@ function AppContainer() {
               </a>
 
 
-              {/* Facebook */}
+              {/* FACEBOOK */}
 
               <a
                 href="https://www.facebook.com/profile.php?id=100026060852750"
@@ -451,7 +638,7 @@ function AppContainer() {
               </a>
 
 
-              {/* TikTok */}
+              {/* TIKTOK */}
 
               <a
                 href="https://www.tiktok.com/@thefkcircle"
@@ -467,7 +654,9 @@ function AppContainer() {
           </div>
 
 
-          {/* IMAGE */}
+          {/* =================================================
+              HOME IMAGE
+          ================================================= */}
 
           <div className="home-image">
 
@@ -515,6 +704,7 @@ function AppContainer() {
             <h3>
               A story of good
             </h3>
+
 
             <p>
 
@@ -887,7 +1077,9 @@ function AppContainer() {
           <button
             type="button"
             title="Go to Home"
-            onClick={() => goToSection("home")}
+            onClick={() =>
+              goToSection("home")
+            }
           >
 
             <i className="bx bx-up-arrow-alt" />
@@ -961,6 +1153,7 @@ function RadialSkill({
           r="80"
         />
 
+
         <circle
           className={`path ${path}`}
           cx="100"
@@ -989,51 +1182,15 @@ function RadialSkill({
 // ROOT
 // =====================================================
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root")
-);
+const root =
+  ReactDOM.createRoot(
+    document.getElementById("root")
+  );
 
 
 root.render(
   <React.StrictMode>
-
-    <HashRouter>
-
-      <Routes>
-
-        {/* =================================================
-            MAIN PORTFOLIO
-        ================================================= */}
-
-        <Route
-          path="/"
-          element={<AppContainer />}
-        />
-
-
-        {/* =================================================
-            EDUCATION PAGE
-        ================================================= */}
-
-        <Route
-          path="/education"
-          element={<Education />}
-        />
-
-
-        {/* =================================================
-            UNKNOWN ROUTES
-        ================================================= */}
-
-        <Route
-          path="*"
-          element={<AppContainer />}
-        />
-
-      </Routes>
-
-    </HashRouter>
-
+    <App />
   </React.StrictMode>
 );
 
